@@ -13,8 +13,8 @@
 #include <GLFW/glfw3.h>
 
 // GL includes
-#include "../../OpenGL libs/shader.h"
-#include "../../OpenGL libs/camera.h"
+#include "../OpenGL libs/shader.h"
+#include "../OpenGL libs/camera.h"
 
 // GLM Mathemtics
 #include <glm/glm.hpp>

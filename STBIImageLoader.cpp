@@ -1,7 +1,7 @@
 #include "STBIImageLoader.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../../OpenGL libs/stb_image.h"
+#include "../OpenGL libs/stb_image.h"
 
 #include <iostream>
 

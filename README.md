@@ -1,7 +1,7 @@
 # Basic-engine-for-OpenGL
 Basic engine to help me learn OpenGL. No pro but learning as I go. Will hopefully expand it's functionality in the future.
 
-#Things to add
+##Things to add
 * Finish image loader to ease loading textures
 * Model loader using assimp. 
 * Add event system for easier keyboard, mouse and "game" event handling

@@ -1,9 +1,9 @@
 
-#include "Engine.h"
+#include "../headers/Engine.h"
 
 #include <string>
-#include "Manager.h"
-#include "STBIImageLoader.h"
+#include "../headers/Manager.h"
+#include "../headers/STBIImageLoader.h"
 
 Engine &Engine::instance()
 {

@@ -116,7 +116,6 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Manager.cpp" />
-    <ClCompile Include="Source.cpp" />
     <ClCompile Include="STBIImageLoader.cpp" />
   </ItemGroup>
   <ItemGroup>

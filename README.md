@@ -1,6 +1,8 @@
 # Basic-engine-for-OpenGL
 Basic engine to help me learn OpenGL. No pro but learning as I go. Will hopefully expand it's functionality in the future.
 
+I used http://learnopengl.com/ to learn OpenGL and to help myself implement the basics of the engine such as shader loading and texture loading.
+
 ## External libraries
 * GLFW
 * GLM

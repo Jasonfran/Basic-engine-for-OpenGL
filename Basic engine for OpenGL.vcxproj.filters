@@ -21,10 +21,16 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Manager.cpp">
+    <ClCompile Include="src\ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\STBIImageLoader.cpp">
+    <ClCompile Include="src\Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,14 +38,24 @@
     <ClInclude Include="includes\Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="includes\ImageLoader.h">
+    <ClInclude Include="includes\ResourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="includes\Manager.h">
+    <ClInclude Include="includes\Texture2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="includes\STBIImageLoader.h">
+    <ClInclude Include="includes\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\BasicScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\basic.fs" />
+    <None Include="shaders\basic.vs" />
   </ItemGroup>
 </Project>

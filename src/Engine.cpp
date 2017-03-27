@@ -1,9 +1,8 @@
 
 #include "../includes/Engine.h"
-
+#include "../includes/BasicScene.h"
 #include <string>
-#include "../includes/Manager.h"
-#include "../includes/STBIImageLoader.h"
+#include <iostream>
 
 Engine &Engine::instance()
 {
@@ -11,20 +10,22 @@ Engine &Engine::instance()
 	return myInstance;
 }
 
-void Engine::init()
+void Engine::init( GLuint width, GLuint height, GLchar* title )
 {
+
 	glfwInit();
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
 	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 	glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
+	
+	createWindow( width, height, title );
 
 	glewExperimental = GL_TRUE;
 	glewInit();
-	
-	STBIImageLoader *stbiLoader = new STBIImageLoader();
-	Manager::setImageLoader( stbiLoader );
 
+
+	update();
 }
 
 void Engine::createWindow( GLuint width, GLuint height, GLchar* title )
@@ -40,8 +41,12 @@ void Engine::createWindow( GLuint width, GLuint height, GLchar* title )
 	glEnable( GL_DEPTH_TEST );
 }
 
-void Engine::mainLoop()
+void Engine::update()
 {
+	if (currentScene == nullptr)
+	{
+		currentScene = new BasicScene();
+	}
 	GLfloat delta = 0.0f;
 	GLfloat lastframetime = 0.0f;
 	while (!glfwWindowShouldClose( mainWindow ))
@@ -51,28 +56,24 @@ void Engine::mainLoop()
 		lastframetime = gametime;
 		std::cout << delta << std::endl;
 
-		update( delta );
+		currentScene->update(delta);
+		render();
 
 	}
 	glfwTerminate();
 }
 
-void Engine::update( GLfloat delta )
+void Engine::render()
 {
 	glfwPollEvents();
-	glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
+	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
+	currentScene->render();
+	std::cout << "I'm pushing the final image to the screen!" << std::endl;
 	glfwSwapBuffers( mainWindow );
 }
 
-void Engine::run()
+void Engine::changeScene( Scene *nextScene )
 {
-	mainLoop();
+	currentScene = nextScene;
 }
-
-Engine::Engine()
-{
-}
-
-

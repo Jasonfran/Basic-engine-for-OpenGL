@@ -12,33 +12,32 @@
 // GLFW
 #include <GLFW/glfw3.h>
 
-// GL includes
-#include "../../OpenGL libs/shader.h"
-#include "../../OpenGL libs/camera.h"
-
 // GLM Mathemtics
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include "../includes/ResourceManager.h"
+#include "../includes/Scene.h"
 
 
 class Engine
 {
 public:
 	static Engine &instance();
-	void init();
-	void createWindow( GLuint width, GLuint height, GLchar* title );
-	void mainLoop();
-	void update( GLfloat delta );
-	void run();
+	void init( GLuint width, GLuint height, GLchar* title );
+	void update();
+	void render();
+	void changeScene(Scene *nextScene);
+	GLFWwindow *getCurrentWindow() { return mainWindow; }
+	Engine() {};
 private:
+	Scene *currentScene;
 	GLFWwindow *mainWindow;
 	GLuint SCREEN_WIDTH;
 	GLuint SCREEN_HEIGHT;
 	GLchar* WINDOW_TITLE;
 	GLuint framerate = 60;
-	Engine();
+	void createWindow( GLuint width, GLuint height, GLchar* title );
 };
 
 #endif

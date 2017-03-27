@@ -2,10 +2,7 @@
 
 int main()
 {
-	Engine &engine = Engine::instance();
-	engine.init();
-	engine.createWindow( 800, 600, "My Engine" );
-	engine.run();
-
+	Engine engine;
+	engine.init( 800, 600, "My engine" );
 	return 0;
 }

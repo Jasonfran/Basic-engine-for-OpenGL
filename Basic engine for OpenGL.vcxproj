@@ -113,16 +113,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\BasicScene.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Manager.cpp" />
-    <ClCompile Include="src\STBIImageLoader.cpp" />
+    <ClCompile Include="src\ResourceManager.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\BasicScene.h" />
     <ClInclude Include="includes\Engine.h" />
-    <ClInclude Include="includes\ImageLoader.h" />
-    <ClInclude Include="includes\Manager.h" />
-    <ClInclude Include="includes\STBIImageLoader.h" />
+    <ClInclude Include="includes\Scene.h" />
+    <ClInclude Include="includes\Shader.h" />
+    <ClInclude Include="includes\Texture2D.h" />
+    <ClInclude Include="includes\ResourceManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\basic.fs" />
+    <None Include="shaders\basic.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

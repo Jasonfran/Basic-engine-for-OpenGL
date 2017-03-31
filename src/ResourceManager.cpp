@@ -3,7 +3,7 @@
 #include <sstream>
 #include <fstream>
 #define STB_IMAGE_IMPLEMENTATION
-#include "../../OpenGL libs/stb_image.h"
+#include <stb_image.h>
 
 std::map<std::string, Texture2D>    ResourceManager::textures;
 std::map<std::string, Shader>       ResourceManager::shaders;

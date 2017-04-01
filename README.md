@@ -12,4 +12,4 @@ I used http://learnopengl.com/ to learn OpenGL and to help myself implement the 
 * Model loader using assimp. 
 * Add event system for easier keyboard, mouse and "game" event handling
 * Build basic GUI functionality, probably [NanoVG](https://github.com/memononen/nanovg) but could try making my own basic buttons and sliders
-* Basic forward rendering to begin with, will move to deferred pipeline once the basics are built
+* Basic forward rendering to begin with, can add deferred rendering functionality once I learn more about it.

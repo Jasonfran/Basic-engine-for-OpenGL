@@ -121,6 +121,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="includes\Mesh.cpp" />
+    <ClCompile Include="includes\Model.cpp" />
     <ClCompile Include="src\BasicScene.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\Main.cpp" />

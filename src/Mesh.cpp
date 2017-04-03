@@ -1,4 +1,5 @@
-#include "Mesh.h"
+#include "../includes/Mesh.h"
+#include <iostream>
 
 Mesh::Mesh( std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures )
 {
@@ -31,6 +32,7 @@ void Mesh::draw( Shader shader )
 		}
 
 		shader.setInteger( ("material." + name + number).c_str(), i );
+		//std::cout << "Binding " << ("material." + name + number) << " To texture unit: " << i << std::endl;
 		glBindTexture( GL_TEXTURE_2D, textures[i].id );
 	}
 	glActiveTexture( GL_TEXTURE0 );

@@ -28,16 +28,21 @@ public:
 	void update();
 	void render();
 	void changeScene(Scene *nextScene);
+	static void keyInput( GLFWwindow * window, int key, int scancode, int action, int mode );
+	static void mouseInput( GLFWwindow * window, double xoffset, double yoffset );
+	static void scrollInput( GLFWwindow * window, double xpos, double ypos );
+	GLuint SCREEN_WIDTH;
+	GLuint SCREEN_HEIGHT;
 	GLFWwindow *getCurrentWindow() { return mainWindow; }
-	Engine() {};
 private:
 	Scene *currentScene;
 	GLFWwindow *mainWindow;
-	GLuint SCREEN_WIDTH;
-	GLuint SCREEN_HEIGHT;
 	GLchar* WINDOW_TITLE;
 	GLuint framerate = 60;
 	void createWindow( GLuint width, GLuint height, GLchar* title );
+	Engine() {};
+	Engine( Engine const& );
+	void operator=( Engine const& ); 
 };
 
 #endif

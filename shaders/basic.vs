@@ -1,8 +1,23 @@
 #version 330 core
-layout (location = 0) in vec3 position; // The position variable has attribute position 0
-layout (location = 1) in vec3 color;
+layout (location = 0) in vec3 Position;
+layout (location = 1) in vec3 Normal;
+layout (location = 2) in vec2 TexCoords;
+
+out VS_OUT {
+    vec3 FragPos;
+    vec3 Normal;
+    vec2 TexCoords;
+} vs_out;
+
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
 
 void main()
 {
-    gl_Position = vec4(position, 1.0); // See how we directly give a vec3 to vec4's constructor
+    gl_Position =  projection * view * model * vec4(Position, 1.0); 
+    vs_out.FragPos = vec3(model * vec4(Position, 1.0));
+    vs_out.Normal = transpose(inverse(mat3(model))) * Normal; // I believe this makes sure the normals are right in non-uniform scaling
+                                                              // Some people use the model*view matrix but I will light in world space, not view space
+    vs_out.TexCoords = TexCoords;
 }

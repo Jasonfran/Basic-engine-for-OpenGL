@@ -3,10 +3,12 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "../includes/SceneObject.h"
 
-class Model
+class Model : public SceneObject
 {
 public:
+	Model() {}
 	Model( GLchar* path )
 	{
 		loadModel( path );

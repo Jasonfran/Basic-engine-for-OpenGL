@@ -2,7 +2,7 @@
 
 int main()
 {
-	Engine engine;
+	Engine &engine = Engine::instance();
 	engine.init( 800, 600, "My engine" );
 	return 0;
 }

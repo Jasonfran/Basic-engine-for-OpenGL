@@ -1,6 +1,7 @@
 
 #include "../includes/Engine.h"
 #include "../includes/BasicScene.h"
+#include "../includes/ResourceManager.h"
 #include <string>
 #include <iostream>
 
@@ -38,6 +39,11 @@ void Engine::createWindow( GLuint width, GLuint height, GLchar* title )
 	glfwMakeContextCurrent( mainWindow );
 	glfwSwapInterval( 1 );
 	glViewport( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
+
+	glfwSetKeyCallback( mainWindow, keyInput );
+	glfwSetCursorPosCallback( mainWindow, mouseInput );
+	glfwSetScrollCallback( mainWindow, scrollInput );
+
 	glEnable( GL_DEPTH_TEST );
 }
 
@@ -54,26 +60,49 @@ void Engine::update()
 		GLfloat gametime = glfwGetTime();
 		delta = gametime - lastframetime;
 		lastframetime = gametime;
-		std::cout << delta << std::endl;
+		//std::cout << delta << std::endl;
 
+		glfwPollEvents();
 		currentScene->update(delta);
 		render();
 
 	}
+	ResourceManager::clear();
 	glfwTerminate();
 }
 
 void Engine::render()
 {
-	glfwPollEvents();
-	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	currentScene->render();
-	std::cout << "I'm pushing the final image to the screen!" << std::endl;
+	//std::cout << "I'm pushing the final image to the screen!" << std::endl;
 	glfwSwapBuffers( mainWindow );
 }
 
 void Engine::changeScene( Scene *nextScene )
 {
+	currentScene->exit();
 	currentScene = nextScene;
+}
+
+// This is a bit messy I think. But it works exactly how I want it to work. These need to be static.
+void Engine::keyInput( GLFWwindow * window, int key, int scancode, int action, int mode )
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose( window, true );
+	}
+	if (action == GLFW_PRESS)
+		Engine::instance().currentScene->keys[key] = true;
+	else if (action == GLFW_RELEASE)
+		Engine::instance().currentScene->keys[key] = false;
+}
+
+void Engine::mouseInput( GLFWwindow * window, double xoffset, double yoffset )
+{
+	Engine::instance().currentScene->mouseInput( xoffset, yoffset );
+}
+
+void Engine::scrollInput( GLFWwindow * window, double xpos, double ypos )
+{
+	Engine::instance().currentScene->scrollInput( xpos, ypos );
 }

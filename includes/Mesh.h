@@ -4,6 +4,7 @@
 #include <GL\glew.h>
 #include <vector>
 #include "../includes/Shader.h"
+#include "../includes/assimp/types.h"
 
 enum MaterialType
 {
@@ -21,6 +22,7 @@ struct Texture
 {
 	GLuint id;
 	MaterialType type;
+	aiString path;
 };
 
 class Mesh

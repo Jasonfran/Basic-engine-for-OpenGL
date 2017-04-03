@@ -76,3 +76,11 @@ Texture2D ResourceManager::getTexture( std::string name )
 {
 	return textures[name];
 }
+
+void ResourceManager::clear()
+{
+	for (auto iter : shaders)
+		glDeleteProgram( iter.second.shaderID );
+	for (auto iter : textures)
+		glDeleteTextures( 1, &iter.second.textureID );
+}

@@ -7,6 +7,7 @@
 
 std::map<std::string, Texture2D>    ResourceManager::textures;
 std::map<std::string, Shader>       ResourceManager::shaders;
+std::map<std::string, Framebuffer> ResourceManager::framebuffers;
 
 Shader ResourceManager::loadShader( const GLchar *vertFile, const GLchar *fragFile, const GLchar *geomFile, std::string name )
 {
@@ -76,6 +77,42 @@ Texture2D ResourceManager::getTexture( std::string name )
 {
 	return textures[name];
 }
+
+GLuint ResourceManager::createFramebuffer( std::string name, GLuint width, GLuint height )
+{
+	GLuint fbo;
+	glGenFramebuffers( 1, &fbo );
+	std::cout << "Generated FBO: " << fbo << std::endl;
+	Framebuffer framebuffer;
+	framebuffer.fbo = fbo;
+	framebuffer.width = width;
+	framebuffer.height = height;
+
+	Texture2D depthTexture;
+	depthTexture.generate( framebuffer.width, framebuffer.height, NULL, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST );
+	glBindFramebuffer( GL_FRAMEBUFFER, framebuffer.fbo );
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture.textureID, 0 );
+	GLuint status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
+	if ( status != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer not complete! " << status << std::endl;
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+	glBindTexture( GL_TEXTURE_2D, 0 );
+	framebuffer.depthTexture = depthTexture.textureID;
+	framebuffers[name] = framebuffer;
+	return framebuffer.fbo;
+}
+
+void ResourceManager::addColourTextureToFramebuffer(std::string fboName, std::string textureName, GLuint internalFormat, GLuint format, GLuint dataType )
+{
+	Framebuffer &framebuffer = framebuffers[fboName];
+	Texture2D texture;
+	texture.generate( framebuffer.width, framebuffer.height, NULL, internalFormat, format, dataType );
+	glBindFramebuffer( GL_FRAMEBUFFER, framebuffer.fbo );
+	framebuffer.colourTextures[textureName] = texture.textureID;
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + framebuffer.colourTextures.size()-1, GL_TEXTURE_2D, texture.textureID, 0 );
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
 
 void ResourceManager::clear()
 {

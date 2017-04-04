@@ -5,6 +5,7 @@
 #include "../includes/Camera.h"
 #include <GLFW/glfw3.h>
 #include <memory>
+#include "UsefulObjects.h"
 
 class BasicScene : public Scene
 {
@@ -16,4 +17,5 @@ public:
 	void mouseInput( double xoffset, double yoffset );
 	void scrollInput( double xpos, double ypos );
 	void exit();
+	TexturedScreenQuad screenQuad;
 };

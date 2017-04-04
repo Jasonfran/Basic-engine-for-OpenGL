@@ -132,46 +132,10 @@
     <ClCompile Include="src\Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="includes\assimp\ai_assert.h" />
-    <ClInclude Include="includes\assimp\anim.h" />
-    <ClInclude Include="includes\assimp\camera.h" />
-    <ClInclude Include="includes\assimp\cexport.h" />
-    <ClInclude Include="includes\assimp\cfileio.h" />
-    <ClInclude Include="includes\assimp\cimport.h" />
-    <ClInclude Include="includes\assimp\color4.h" />
-    <ClInclude Include="includes\assimp\Compiler\poppack1.h" />
-    <ClInclude Include="includes\assimp\Compiler\pstdint.h" />
-    <ClInclude Include="includes\assimp\Compiler\pushpack1.h" />
-    <ClInclude Include="includes\assimp\config.h" />
-    <ClInclude Include="includes\assimp\DefaultLogger.hpp" />
-    <ClInclude Include="includes\assimp\defs.h" />
-    <ClInclude Include="includes\assimp\Exporter.hpp" />
-    <ClInclude Include="includes\assimp\Importer.hpp" />
-    <ClInclude Include="includes\assimp\importerdesc.h" />
-    <ClInclude Include="includes\assimp\IOStream.hpp" />
-    <ClInclude Include="includes\assimp\IOSystem.hpp" />
-    <ClInclude Include="includes\assimp\light.h" />
-    <ClInclude Include="includes\assimp\Logger.hpp" />
-    <ClInclude Include="includes\assimp\LogStream.hpp" />
-    <ClInclude Include="includes\assimp\material.h" />
-    <ClInclude Include="includes\assimp\matrix3x3.h" />
-    <ClInclude Include="includes\assimp\matrix4x4.h" />
-    <ClInclude Include="includes\assimp\mesh.h" />
-    <ClInclude Include="includes\assimp\metadata.h" />
-    <ClInclude Include="includes\assimp\NullLogger.hpp" />
-    <ClInclude Include="includes\assimp\port\AndroidJNI\AndroidJNIIOSystem.h" />
-    <ClInclude Include="includes\assimp\postprocess.h" />
-    <ClInclude Include="includes\assimp\ProgressHandler.hpp" />
-    <ClInclude Include="includes\assimp\quaternion.h" />
-    <ClInclude Include="includes\assimp\scene.h" />
-    <ClInclude Include="includes\assimp\texture.h" />
-    <ClInclude Include="includes\assimp\types.h" />
-    <ClInclude Include="includes\assimp\vector2.h" />
-    <ClInclude Include="includes\assimp\vector3.h" />
-    <ClInclude Include="includes\assimp\version.h" />
     <ClInclude Include="includes\BasicScene.h" />
     <ClInclude Include="includes\Camera.h" />
     <ClInclude Include="includes\Engine.h" />
+    <ClInclude Include="includes\Framebuffer.h" />
     <ClInclude Include="includes\SceneObject.h" />
     <ClInclude Include="includes\PointLight.h" />
     <ClInclude Include="includes\Mesh.h" />
@@ -180,17 +144,13 @@
     <ClInclude Include="includes\Shader.h" />
     <ClInclude Include="includes\Texture2D.h" />
     <ClInclude Include="includes\ResourceManager.h" />
+    <ClInclude Include="includes\UsefulObjects.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="includes\assimp\color4.inl" />
-    <None Include="includes\assimp\material.inl" />
-    <None Include="includes\assimp\matrix3x3.inl" />
-    <None Include="includes\assimp\matrix4x4.inl" />
-    <None Include="includes\assimp\quaternion.inl" />
-    <None Include="includes\assimp\vector2.inl" />
-    <None Include="includes\assimp\vector3.inl" />
     <None Include="shaders\basic.fs" />
     <None Include="shaders\basic.vs" />
+    <None Include="shaders\quad.fs" />
+    <None Include="shaders\quad.vs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\assimp.lib" />

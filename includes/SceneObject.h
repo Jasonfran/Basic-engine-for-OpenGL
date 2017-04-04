@@ -18,14 +18,14 @@ public:
 		glm::mat4 tempmodel = glm::mat4();
 		tempmodel = glm::translate( tempmodel, position );
 		tempmodel = glm::rotate( tempmodel, rotationAngle, rotationAxis );
-		tempmodel = glm::scale( tempmodel, scale );
-		this->model = model; //will store in case I want to stop updating model matrix but want the last matrix used
+		tempmodel = glm::scale( tempmodel, this->scale );
+		model = tempmodel; //will store in case I want to stop updating model matrix but want the last matrix used
 		return model;
 	}
 private:
 	glm::mat4 model;
-	glm::vec3 position = glm::vec3(0.0f);
-	GLfloat rotationAngle = 0.0f;
-	glm::vec3 rotationAxis = glm::vec3(0.0f);
-	glm::vec3 scale = glm::vec3(0.0f);
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+	GLfloat rotationAngle = glm::radians(0.0f);
+	glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 };

@@ -100,7 +100,7 @@ public:
 		if (key == DOWN) 
 			this->Position.y -= velocity;
 		if (key == SPEEDUP)
-			this->multiplier = 2.0f;
+			this->multiplier = 5.0f;
 		else if (key == SLOWDOWN)
 			this->multiplier = 0.5f;
 		else 

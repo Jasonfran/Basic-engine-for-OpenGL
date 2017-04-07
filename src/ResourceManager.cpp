@@ -48,6 +48,9 @@ Shader ResourceManager::loadShader( const GLchar *vertFile, const GLchar *fragFi
 	const GLchar *fragShaderCode = fragCode.c_str();
 	const GLchar *geomShaderCode = geomCode.c_str();
 	Shader shader;
+	shader.vertPath = vertFile;
+	shader.fragPath = fragFile;
+	shader.geomPath = geomFile;
 	shader.compile( vertShaderCode, fragShaderCode, geomFile != nullptr ? fragShaderCode : nullptr );
 	shaders[name] = shader;
 	return shaders[name];
@@ -73,12 +76,59 @@ Texture2D ResourceManager::loadTexture( const GLchar *file, GLboolean RGBA, std:
 	return texture;
 }
 
+void ResourceManager::reloadShaders()
+{
+	for (auto &s : shaders)
+	{	
+		glUseProgram( 0 );
+		glDeleteProgram( s.second.shaderID );
+		std::string vertCode;
+		std::string fragCode;
+		std::string geomCode;
+		std::ifstream vertexShaderFile;
+		std::ifstream fragmentShaderFile;
+		std::ifstream geomShaderFile;
+		vertexShaderFile.exceptions( std::ifstream::badbit );
+		fragmentShaderFile.exceptions( std::ifstream::badbit );
+		geomShaderFile.exceptions( std::ifstream::badbit );
+		try
+		{
+			vertexShaderFile.open( s.second.vertPath );
+			fragmentShaderFile.open( s.second.fragPath );
+			std::stringstream vShaderStream, fShaderStream;
+			vShaderStream << vertexShaderFile.rdbuf();
+			fShaderStream << fragmentShaderFile.rdbuf();
+			vertexShaderFile.close();
+			fragmentShaderFile.close();
+			vertCode = vShaderStream.str();
+			fragCode = fShaderStream.str();
+			if (s.second.geomPath != nullptr)
+			{
+				geomShaderFile.open( s.second.geomPath );
+				std::stringstream gShaderStream;
+				gShaderStream << geomShaderFile.rdbuf();
+				geomShaderFile.close();
+				geomCode = gShaderStream.str();
+			}
+		}
+		catch (std::exception e)
+		{
+			std::cout << "SHADER ERROR: FAILED TO READ SHADER FILE(S)" << std::endl;
+		}
+		const GLchar *vertShaderCode = vertCode.c_str();
+		const GLchar *fragShaderCode = fragCode.c_str();
+		const GLchar *geomShaderCode = geomCode.c_str();
+		s.second.compile( vertShaderCode, fragShaderCode, s.second.geomPath != nullptr ? fragShaderCode : nullptr );
+	}
+	std::cout << "Shaders reloaded" << std::endl;
+}
+
 Texture2D ResourceManager::getTexture( std::string name )
 {
 	return textures[name];
 }
 
-GLuint ResourceManager::createFramebuffer( std::string name, GLuint width, GLuint height )
+GLuint ResourceManager::createFramebuffer( std::string name, GLuint width, GLuint height, GLboolean addDepth)
 {
 	GLuint fbo;
 	glGenFramebuffers( 1, &fbo );
@@ -87,17 +137,21 @@ GLuint ResourceManager::createFramebuffer( std::string name, GLuint width, GLuin
 	framebuffer.fbo = fbo;
 	framebuffer.width = width;
 	framebuffer.height = height;
-
+	
 	Texture2D depthTexture;
-	depthTexture.generate( framebuffer.width, framebuffer.height, NULL, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST );
-	glBindFramebuffer( GL_FRAMEBUFFER, framebuffer.fbo );
-	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture.textureID, 0 );
+	if (addDepth)
+	{
+		depthTexture.generate( framebuffer.width, framebuffer.height, NULL, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST );
+		glBindFramebuffer( GL_FRAMEBUFFER, framebuffer.fbo );
+		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture.textureID, 0 );
+	}
 	GLuint status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
 	if ( status != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Framebuffer not complete! " << status << std::endl;
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	glBindTexture( GL_TEXTURE_2D, 0 );
-	framebuffer.depthTexture = depthTexture.textureID;
+	if (addDepth)
+		framebuffer.depthTexture = depthTexture.textureID;
 	framebuffers[name] = framebuffer;
 	return framebuffer.fbo;
 }

@@ -14,20 +14,23 @@ void Mesh::draw( Shader shader )
 {
 	GLuint diffuseNr = 1;
 	GLuint specularNr = 1;
-	for (GLuint i = 0; i < textures.size(); i++)
+	GLuint numTextures = textures.size();
+	std::cout << numTextures << std::endl;
+	for (GLuint i = 0; i < numTextures; i++)
 	{
 		glActiveTexture( GL_TEXTURE0 + i );
 		std::string number;
 		std::string name;
 		MaterialType matType = textures[i].type;
+		std::cout << matType << std::endl;
 		if (matType == DIFFUSE)
 		{
-			name = "diffuse";
+			name = "diffuseTex";
 			number = std::to_string( diffuseNr++ );
 		}
 		else if (matType == SPECULAR)
 		{
-			name = "specular";
+			name = "specularTex";
 			number = std::to_string( specularNr++ );
 		}
 

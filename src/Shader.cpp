@@ -101,6 +101,14 @@ void Shader::setMatrix4( const GLchar *name, const glm::mat4 &matrix, GLboolean 
 	glUniformMatrix4fv( glGetUniformLocation( this->shaderID, name ), 1, GL_FALSE, glm::value_ptr( matrix ) );
 }
 
+void Shader::setVP(glm::mat4 view, glm::mat4 projection, GLboolean useShader )
+{
+	if (useShader)
+		this->use();
+	setMatrix4( "view", view );
+	setMatrix4( "projection", projection );
+}
+
 void Shader::checkCompileErrors( GLuint object, std::string type )
 {
 	GLint success;

@@ -12,8 +12,9 @@ class BasicScene : public Scene
 public:
 	BasicScene();
 	void update( GLfloat delta);
+	void updateShaderUniforms( GLfloat delta );
 	void render();
-	void keyInput();
+	void keyInput(GLfloat delta);
 	void mouseInput( double xoffset, double yoffset );
 	void scrollInput( double xpos, double ypos );
 	void exit();

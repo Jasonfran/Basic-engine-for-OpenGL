@@ -17,7 +17,7 @@ void main()
 {
     gl_Position =  projection * view * model * vec4(Position, 1.0); 
     vs_out.FragPos = vec3(model * vec4(Position, 1.0));
-    vs_out.Normal = transpose(inverse(mat3(model))) * Normal; // I believe this makes sure the normals are right in non-uniform scaling
+    vs_out.Normal = normalize(transpose(inverse(mat3(model))) * Normal); // I believe this makes sure the normals are right in non-uniform scaling
                                                               // Some people use the model*view matrix but I will light in world space, not view space
     vs_out.TexCoords = TexCoords;
 }

@@ -8,31 +8,34 @@ in VS_OUT {
 uniform sampler2D screenTexture;
 uniform sampler2D depthTexture;
 
-uniform mat4 projection;
-uniform mat4 view;
-uniform mat4 prevProjection;
-uniform mat4 prevView;
+uniform mat4 inverseViewProjection;
+uniform mat4 prevViewProjection;
 
-int nSamples = 32;
+int nSamples = 24;
 vec2 texCoords = fs_in.TexCoords;
 
 void main(){
     float depth = texture(depthTexture, texCoords).r; // [1.0, 0.0]
-    vec4 viewportPos = vec4(texCoords.x * 2 - 1, (1 - texCoords.y) * 2 - 1, depth, 1);
-    vec4 D = inverse(projection * view) * viewportPos;
-    vec4 worldPos = D / D.w;
+    vec4 clipSpace = vec4(texCoords.x * 2 - 1, texCoords.y * 2 - 1, depth * 2 - 1, 1); //[-1.0, 1.0]
+    vec4 worldPos = inverseViewProjection * clipSpace;
+    worldPos /= worldPos.w;
 
-    vec4 currentPos = viewportPos;
-    vec4 previousPos = prevProjection * prevView * worldPos;
+    vec4 currentPos = clipSpace;
+    vec4 previousPos = prevViewProjection * worldPos;
     previousPos /= previousPos.w;
     vec2 velocity = vec2(currentPos - previousPos);
 
     vec4 result = texture(screenTexture, texCoords);
     for(int i = 1; i < nSamples; ++i){
         vec2 offset = velocity * (float(i) / float(nSamples - 1) - 0.5);
-        result += texture(screenTexture, texCoords+offset);
+        if((texCoords+offset).x >= 0.0f && (texCoords+offset).x <= 1.0f 
+        && (texCoords+offset).y >= 0.0f && (texCoords+offset).y <= 1.0f){   //Can make sure it's not over sampling
+            result += texture(screenTexture, texCoords+offset);
+        }else{
+            result += texture(screenTexture, texCoords);
+        }
     }
-    result /= float(nSamples);
+    result /= nSamples;
     colour = result;
 
 }

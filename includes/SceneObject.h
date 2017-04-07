@@ -1,8 +1,8 @@
 #pragma once
-#include "../includes/Shader.h"
+#include "Shader.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
+#include "Material.h"
 class SceneObject
 {
 public:
@@ -22,10 +22,15 @@ public:
 		model = tempmodel; //will store in case I want to stop updating model matrix but want the last matrix used
 		return model;
 	}
+	glm::mat4 getModelMatrix() { return model; }
+	void setMaterial( Material mat ) { material = mat; }
+	Material getMaterial() { return material; }
+
 private:
 	glm::mat4 model;
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 	GLfloat rotationAngle = glm::radians(0.0f);
 	glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
+	Material material;
 };

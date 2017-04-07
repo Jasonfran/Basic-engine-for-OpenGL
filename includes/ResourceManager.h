@@ -18,9 +18,10 @@ public:
 	static Shader getShader( std::string name );
 
 	static Texture2D loadTexture( const GLchar* file, GLboolean RGBA, std::string name );
+	static void reloadShaders();
 	static Texture2D getTexture( std::string name );
 
-	static GLuint createFramebuffer( std::string name, GLuint width, GLuint height );
+	static GLuint createFramebuffer( std::string name, GLuint width, GLuint height, GLboolean addDepth = true );
 	static void addColourTextureToFramebuffer( std::string fboName, std::string textureName, GLuint internalFormat, GLuint format, GLuint dataType );
 	static Framebuffer getFramebuffer( std::string name ) { return framebuffers[name]; }
 

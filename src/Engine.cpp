@@ -91,6 +91,12 @@ void Engine::keyInput( GLFWwindow * window, int key, int scancode, int action, i
 	{
 		glfwSetWindowShouldClose( window, true );
 	}
+
+	if (key == GLFW_KEY_R && action == GLFW_PRESS)
+	{
+		ResourceManager::reloadShaders();
+	}
+
 	if (action == GLFW_PRESS)
 		Engine::instance().currentScene->keys[key] = true;
 	else if (action == GLFW_RELEASE)

@@ -39,6 +39,9 @@
     <ClCompile Include="src\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\UsefulObjects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\PointLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -83,12 +86,17 @@
     <ClInclude Include="includes\UsefulObjects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\basic.fs" />
     <None Include="shaders\basic.vs" />
     <None Include="shaders\quad.fs" />
     <None Include="shaders\quad.vs" />
+    <None Include="shaders\light.fs" />
+    <None Include="shaders\light.vs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\assimp.lib" />

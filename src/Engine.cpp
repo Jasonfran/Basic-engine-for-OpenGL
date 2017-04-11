@@ -1,10 +1,10 @@
 
 #include "../includes/Engine.h"
 #include "../includes/BasicScene.h"
-#include "../includes/ResourceManager.h"
+#include "../includes/Input.h"
 #include <string>
 #include <iostream>
-
+#include "../includes/ResourceManager.h"
 Engine &Engine::instance()
 {
 	static Engine myInstance;
@@ -40,10 +40,11 @@ void Engine::createWindow( GLuint width, GLuint height, GLchar* title )
 	glfwSwapInterval( 1 );
 	glViewport( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
 
-	glfwSetKeyCallback( mainWindow, keyInput );
-	glfwSetCursorPosCallback( mainWindow, mouseInput );
-	glfwSetScrollCallback( mainWindow, scrollInput );
-
+	glfwSetKeyCallback( mainWindow, Input::updateKey );
+	glfwSetMouseButtonCallback( mainWindow, Input::updateMouseButton);
+	glfwSetCursorPosCallback( mainWindow, Input::mouseInput );
+	glfwSetScrollCallback( mainWindow, Input::scrollInput );
+	glfwWindowHint( GLFW_SAMPLES, 4 );
 	glEnable( GL_DEPTH_TEST );
 }
 
@@ -62,7 +63,11 @@ void Engine::update()
 		lastframetime = gametime;
 		//std::cout << delta << std::endl;
 
+		Input::updateStates();
 		glfwPollEvents();
+		globalKeyInput();
+		currentScene->keyInput(delta);
+		currentScene->mouseButtonInput();
 		currentScene->update(delta);
 		render();
 
@@ -80,35 +85,26 @@ void Engine::render()
 
 void Engine::changeScene( Scene *nextScene )
 {
-	currentScene->exit();
 	currentScene = nextScene;
 }
 
-// This is a bit messy I think. But it works exactly how I want it to work. These need to be static.
-void Engine::keyInput( GLFWwindow * window, int key, int scancode, int action, int mode )
+void Engine::globalKeyInput()
 {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+
+	if (Input::keyWasPressed(GLFW_KEY_ESCAPE))
 	{
-		glfwSetWindowShouldClose( window, true );
+		glfwSetWindowShouldClose( mainWindow, true );
 	}
 
-	if (key == GLFW_KEY_R && action == GLFW_PRESS)
+	if (Input::keyWasPressed(GLFW_KEY_R))
 	{
 		ResourceManager::reloadShaders();
 	}
 
-	if (action == GLFW_PRESS)
-		Engine::instance().currentScene->keys[key] = true;
-	else if (action == GLFW_RELEASE)
-		Engine::instance().currentScene->keys[key] = false;
-}
-
-void Engine::mouseInput( GLFWwindow * window, double xoffset, double yoffset )
-{
-	Engine::instance().currentScene->mouseInput( xoffset, yoffset );
-}
-
-void Engine::scrollInput( GLFWwindow * window, double xpos, double ypos )
-{
-	Engine::instance().currentScene->scrollInput( xpos, ypos );
+	if (Input::keyWasPressed( GLFW_KEY_TAB ))
+	{
+		//currentScene->exit();
+		delete currentScene;
+		changeScene( new BasicScene() );
+	}
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "../includes/SceneObject.h"
+#include "SceneObject.h"
 
 class PointLight : public SceneObject
 {
@@ -50,6 +50,10 @@ public:
 	glm::vec3 getColour()
 	{
 		return colour;
+	}
+	~PointLight()
+	{
+		std::cout << "Pointlight gone" << std::endl;
 	}
 private:
 	static GLfloat vertices[180];

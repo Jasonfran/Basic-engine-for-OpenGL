@@ -121,6 +121,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\BasicScene.cpp" />
@@ -137,6 +138,7 @@
     <ClInclude Include="includes\Camera.h" />
     <ClInclude Include="includes\Engine.h" />
     <ClInclude Include="includes\Framebuffer.h" />
+    <ClInclude Include="includes\Input.h" />
     <ClInclude Include="includes\Material.h" />
     <ClInclude Include="includes\SceneObject.h" />
     <ClInclude Include="includes\PointLight.h" />
@@ -153,8 +155,10 @@
     <None Include="shaders\basic.vs" />
     <None Include="shaders\light.fs" />
     <None Include="shaders\light.vs" />
-    <None Include="shaders\quad.fs" />
-    <None Include="shaders\quad.vs" />
+    <None Include="shaders\postprocess\quad.fs" />
+    <None Include="shaders\postprocess\quad.vs" />
+    <None Include="shaders\shadowdepth.fs" />
+    <None Include="shaders\shadowdepth.vs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\assimp.lib" />

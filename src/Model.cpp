@@ -3,12 +3,12 @@
 #include "../includes/stb_image.h"
 
 #include <iostream>
-
+#include <memory>
 GLint textureFromFile( const char* path, std::string directory );
 
 void Model::draw(Shader shader)
 {
-	for (Mesh m : meshes) {
+	for (Mesh &m : meshes) {
 		m.draw(shader);
 	}
 }
@@ -16,7 +16,7 @@ void Model::draw(Shader shader)
 void Model::loadModel(std::string path)
 {
 	Assimp::Importer importer;
-	const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals );
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 		std::cout << "Error: Assimp: " << importer.GetErrorString() << std::endl;
@@ -25,6 +25,7 @@ void Model::loadModel(std::string path)
 
 	directory = path.substr(0, path.find_last_of('/'));
 	processNode(scene->mRootNode, scene);
+	//importer.FreeScene();
 }
 
 void Model::processNode(aiNode * node, const aiScene * scene)
@@ -99,6 +100,16 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType
 		textures.push_back( texture );
 	}
 	return textures;
+}
+
+Model::~Model()
+{
+	std::cout << "Model destroyed" << std::endl;
+	for (Mesh &m : meshes)
+	{
+		std::cout << "Destroying meshes" << std::endl;
+		m.deleteBuffers();
+	}
 }
 
 GLint textureFromFile( const char* path, std::string directory )

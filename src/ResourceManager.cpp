@@ -79,7 +79,7 @@ Texture2D ResourceManager::loadTexture( const GLchar *file, GLboolean RGBA, std:
 void ResourceManager::reloadShaders()
 {
 	for (auto &s : shaders)
-	{	
+	{
 		glUseProgram( 0 );
 		glDeleteProgram( s.second.shaderID );
 		std::string vertCode;
@@ -128,7 +128,7 @@ Texture2D ResourceManager::getTexture( std::string name )
 	return textures[name];
 }
 
-GLuint ResourceManager::createFramebuffer( std::string name, GLuint width, GLuint height, GLboolean addDepth)
+GLuint ResourceManager::createFramebuffer( std::string name, GLuint width, GLuint height, GLboolean addDepth, GLboolean forShadows )
 {
 	GLuint fbo;
 	glGenFramebuffers( 1, &fbo );
@@ -137,16 +137,27 @@ GLuint ResourceManager::createFramebuffer( std::string name, GLuint width, GLuin
 	framebuffer.fbo = fbo;
 	framebuffer.width = width;
 	framebuffer.height = height;
-	
+
 	Texture2D depthTexture;
 	if (addDepth)
 	{
-		depthTexture.generate( framebuffer.width, framebuffer.height, NULL, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST );
+		if (forShadows)
+		{
+
+			GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+			depthTexture.generate( framebuffer.width, framebuffer.height, NULL, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER, GL_NEAREST, GL_NEAREST );
+			depthTexture.bind();
+			glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor );
+			glBindTexture( GL_TEXTURE_2D, 0 );
+		}else
+			depthTexture.generate( framebuffer.width, framebuffer.height, NULL, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST );
 		glBindFramebuffer( GL_FRAMEBUFFER, framebuffer.fbo );
 		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture.textureID, 0 );
+		if(forShadows)
+			glDrawBuffer( GL_NONE );
 	}
 	GLuint status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
-	if ( status != GL_FRAMEBUFFER_COMPLETE)
+	if (status != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Framebuffer not complete! " << status << std::endl;
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	glBindTexture( GL_TEXTURE_2D, 0 );
@@ -156,14 +167,14 @@ GLuint ResourceManager::createFramebuffer( std::string name, GLuint width, GLuin
 	return framebuffer.fbo;
 }
 
-void ResourceManager::addColourTextureToFramebuffer(std::string fboName, std::string textureName, GLuint internalFormat, GLuint format, GLuint dataType )
+void ResourceManager::addColourTextureToFramebuffer( std::string fboName, std::string textureName, GLuint internalFormat, GLuint format, GLuint dataType )
 {
 	Framebuffer &framebuffer = framebuffers[fboName];
 	Texture2D texture;
 	texture.generate( framebuffer.width, framebuffer.height, NULL, internalFormat, format, dataType );
 	glBindFramebuffer( GL_FRAMEBUFFER, framebuffer.fbo );
 	framebuffer.colourTextures[textureName] = texture.textureID;
-	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + framebuffer.colourTextures.size()-1, GL_TEXTURE_2D, texture.textureID, 0 );
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + framebuffer.colourTextures.size() - 1, GL_TEXTURE_2D, texture.textureID, 0 );
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
@@ -172,6 +183,11 @@ void ResourceManager::clear()
 {
 	for (auto iter : shaders)
 		glDeleteProgram( iter.second.shaderID );
+	shaders.clear();
 	for (auto iter : textures)
 		glDeleteTextures( 1, &iter.second.textureID );
+	textures.clear();
+	for (auto iter : framebuffers)
+		glDeleteFramebuffers( 1, &iter.second.fbo );
+	framebuffers.clear();
 }

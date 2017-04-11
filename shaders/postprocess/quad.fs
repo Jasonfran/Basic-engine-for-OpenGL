@@ -11,6 +11,8 @@ uniform sampler2D depthTexture;
 uniform mat4 inverseViewProjection;
 uniform mat4 prevViewProjection;
 
+uniform int alternativeView;
+
 int nSamples = 24;
 vec2 texCoords = fs_in.TexCoords;
 
@@ -36,6 +38,10 @@ void main(){
         }
     }
     result /= nSamples;
-    colour = result;
+    // float f=100.0;
+    // float n = 0.1;
+    // float z = (2 * n) / (f + n - texture( screenTexture, texCoords ).r * (f - n));
 
+    // colour = vec4(vec3(z), 1.0f);
+    colour = result;
 }

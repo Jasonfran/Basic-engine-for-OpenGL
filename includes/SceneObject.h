@@ -1,8 +1,10 @@
 #pragma once
-#include "Shader.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Material.h"
+#include <iostream>
+class Shader;
+
 class SceneObject
 {
 public:
@@ -25,7 +27,7 @@ public:
 	glm::mat4 getModelMatrix() { return model; }
 	void setMaterial( Material mat ) { material = mat; }
 	Material getMaterial() { return material; }
-
+	virtual ~SceneObject() {}
 private:
 	glm::mat4 model;
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);

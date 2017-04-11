@@ -1,4 +1,6 @@
 #pragma once
+#ifndef CAMERA_H
+#define CAMERA_H
 
 // Std. Includes
 #include <vector>
@@ -8,20 +10,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
-
-
-// Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
-enum Camera_Movement {
-    FORWARD,
-    BACKWARD,
-    LEFT,
-    RIGHT,
-	UP,
-	DOWN,
-	SPEEDUP,
-	SLOWDOWN
-};
-
+#include "Input.h"
+#include "Engine.h"
 // Default camera values
 const GLfloat YAW        = -90.0f;
 const GLfloat PITCH      =  0.0f;
@@ -84,34 +74,53 @@ public:
 	}
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-    void ProcessKeyboard(Camera_Movement key, GLfloat deltaTime)
+    void ProcessKeyboard(GLfloat deltaTime)
     {
 		GLfloat velocity = this->MovementSpeed * deltaTime * multiplier;
-        if (key == FORWARD)
-            this->Position += this->Front * velocity;
-        if (key == BACKWARD)
-            this->Position -= this->Front * velocity;
-        if (key == LEFT)
-            this->Position -= this->Right * velocity;
-        if (key == RIGHT)
+
+		if (Input::keyIsHeld(GLFW_KEY_W))
+			this->Position += this->Front * velocity;
+		if (Input::keyIsHeld(GLFW_KEY_S))
+			this->Position -= this->Front * velocity;
+		if (Input::keyIsHeld(GLFW_KEY_A))
+			this->Position -= this->Right * velocity;
+		if (Input::keyIsHeld(GLFW_KEY_D))
 			this->Position += this->Right * velocity;
-		if (key == UP) 
+		if (Input::keyIsHeld(GLFW_KEY_SPACE))
 			this->Position.y += velocity;
-		if (key == DOWN) 
+		if (Input::keyIsHeld(GLFW_KEY_LEFT_CONTROL))
 			this->Position.y -= velocity;
-		if (key == SPEEDUP)
+		if (Input::keyIsHeld(GLFW_KEY_LEFT_SHIFT))
 			this->multiplier = 5.0f;
-		else if (key == SLOWDOWN)
+		else if (Input::keyIsHeld(GLFW_KEY_LEFT_ALT))
 			this->multiplier = 0.5f;
-		else 
+		else
 			this->multiplier = 1.0f;
     }
 
+	GLboolean firstMouse = true;
+	GLfloat lastX = Engine::instance().SCREEN_WIDTH/2.0f, lastY = Engine::instance().SCREEN_HEIGHT/2.0f;
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-    void ProcessMouseMovement(GLfloat xoffset, GLfloat yoffset, GLboolean constrainPitch = true)
+    void ProcessMouseMovement(GLboolean constrainPitch = true)
     {
-        xoffset *= this->AdjustedMouseSensitivity;
-        yoffset *= this->AdjustedMouseSensitivity;
+		std::pair<GLfloat, GLfloat> mousePos = Input::getMousePos();
+		GLfloat xpos = mousePos.first;
+		GLfloat ypos = mousePos.second;
+		if (firstMouse)
+		{
+			lastX = xpos;
+			lastY = ypos;
+			firstMouse = false;
+		}
+
+		GLfloat xoffset = xpos - lastX;
+		GLfloat yoffset = lastY - ypos;
+
+		lastX = xpos;
+		lastY = ypos;
+
+		xoffset *= this->AdjustedMouseSensitivity;
+		yoffset *= this->AdjustedMouseSensitivity;
 
         this->Yaw   += xoffset;
         this->Pitch += yoffset;
@@ -129,13 +138,19 @@ public:
         this->updateCameraVectors();
     }
 
+	void resetMouse()
+	{
+		lastX = Engine::instance().SCREEN_WIDTH / 2.0f, lastY = Engine::instance().SCREEN_HEIGHT / 2.0f;
+		firstMouse = true;
+	}
+
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-    void ProcessMouseScroll(GLfloat yoffset)
+    void ProcessMouseScroll()
     {
+		GLfloat yoffset = Input::getScrollOffset().second;
 		if (this->FOV >= 1.0f && this->FOV <= this->MaxFOV){
 			this->FOV -= yoffset;
 			this->AdjustedMouseSensitivity = this->MouseSensitivity * (this->FOV / this->MaxFOV);
-			//std::cout << this->AdjustedMouseSensitivity << std::endl;
 			if (AdjustedMouseSensitivity <= 0) {
 				this->AdjustedMouseSensitivity = this->MouseSensitivity * (1.0f / this->MaxFOV);
 			}
@@ -144,7 +159,6 @@ public:
             this->FOV = 1.0f;
         if (this->FOV >= 45.0f)
             this->FOV = 45.0f;
-		std::cout << FOV << std::endl;
     }
 
 private:
@@ -162,3 +176,4 @@ private:
         this->Up    = glm::normalize(glm::cross(this->Right, this->Front));
     }
 };
+#endif // !CAMERA_H

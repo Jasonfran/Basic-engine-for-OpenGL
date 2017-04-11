@@ -15,14 +15,14 @@ void Mesh::draw( Shader shader )
 	GLuint diffuseNr = 1;
 	GLuint specularNr = 1;
 	GLuint numTextures = textures.size();
-	std::cout << numTextures << std::endl;
+	//std::cout << numTextures << std::endl;
 	for (GLuint i = 0; i < numTextures; i++)
 	{
 		glActiveTexture( GL_TEXTURE0 + i );
 		std::string number;
 		std::string name;
 		MaterialType matType = textures[i].type;
-		std::cout << matType << std::endl;
+		//std::cout << matType << std::endl;
 		if (matType == DIFFUSE)
 		{
 			name = "diffuseTex";
@@ -73,4 +73,11 @@ void Mesh::setupMesh()
 
 	glBindVertexArray( 0 );
 
+}
+
+void Mesh::deleteBuffers()
+{
+	glDeleteVertexArrays( 1, &VAO );
+	glDeleteBuffers( 1, &VBO );
+	glDeleteBuffers( 1, &EBO );
 }

@@ -21,7 +21,7 @@ public:
 	static void reloadShaders();
 	static Texture2D getTexture( std::string name );
 
-	static GLuint createFramebuffer( std::string name, GLuint width, GLuint height, GLboolean addDepth = true );
+	static GLuint createFramebuffer( std::string name, GLuint width, GLuint height, GLboolean addDepth = true, GLboolean forShadow = false );
 	static void addColourTextureToFramebuffer( std::string fboName, std::string textureName, GLuint internalFormat, GLuint format, GLuint dataType );
 	static Framebuffer getFramebuffer( std::string name ) { return framebuffers[name]; }
 

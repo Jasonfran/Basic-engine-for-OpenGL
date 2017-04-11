@@ -1,8 +1,5 @@
 #pragma once
-#include "../includes/Scene.h"
-#include "../includes/Shader.h"
-#include "../includes/Model.h"
-#include "../includes/Camera.h"
+#include "Scene.h"
 #include <GLFW/glfw3.h>
 #include <memory>
 #include "UsefulObjects.h"
@@ -15,8 +12,9 @@ public:
 	void updateShaderUniforms( GLfloat delta );
 	void render();
 	void keyInput(GLfloat delta);
-	void mouseInput( double xoffset, double yoffset );
-	void scrollInput( double xpos, double ypos );
-	void exit();
+	void mouseButtonInput();
+	void mouseInput();
+	void scrollInput();
+	~BasicScene();
 	TexturedScreenQuad screenQuad;
 };

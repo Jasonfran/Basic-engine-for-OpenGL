@@ -3,17 +3,17 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "../includes/SceneObject.h"
+#include "SceneObject.h"
 
 class Model : public SceneObject
 {
 public:
-	Model() {}
 	Model( GLchar* path )
 	{
 		loadModel( path );
 	}
 	void draw( Shader shader );
+	~Model();
 private:
 	std::vector<Mesh> meshes;
 	std::string directory;

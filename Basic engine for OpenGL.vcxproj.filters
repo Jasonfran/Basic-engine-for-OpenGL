@@ -45,6 +45,9 @@
     <ClCompile Include="src\PointLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\Engine.h">
@@ -89,14 +92,19 @@
     <ClInclude Include="includes\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\basic.fs" />
     <None Include="shaders\basic.vs" />
-    <None Include="shaders\quad.fs" />
-    <None Include="shaders\quad.vs" />
     <None Include="shaders\light.fs" />
     <None Include="shaders\light.vs" />
+    <None Include="shaders\postprocess\quad.fs" />
+    <None Include="shaders\postprocess\quad.vs" />
+    <None Include="shaders\shadowdepth.vs" />
+    <None Include="shaders\shadowdepth.fs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\assimp.lib" />

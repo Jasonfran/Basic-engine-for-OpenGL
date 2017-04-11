@@ -5,6 +5,7 @@ layout (location = 2) in vec2 TexCoords;
 
 out VS_OUT {
     vec3 FragPos;
+    vec4 FragPosLightSpace;
     vec3 Normal;
     vec2 TexCoords;
 } vs_out;
@@ -12,6 +13,7 @@ out VS_OUT {
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
+uniform mat4 lightSpaceMatrix;
 
 void main()
 {
@@ -19,5 +21,6 @@ void main()
     vs_out.FragPos = vec3(model * vec4(Position, 1.0));
     vs_out.Normal = normalize(transpose(inverse(mat3(model))) * Normal); // I believe this makes sure the normals are right in non-uniform scaling
                                                               // Some people use the model*view matrix but I will light in world space, not view space
+    vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
     vs_out.TexCoords = TexCoords;
 }

@@ -17,7 +17,8 @@ Has easy scene creation, model loading, input, buffer creation. This scene blinn
 ## Things to do
 * Need to add multiple lights
 * Need to add common a common material system so the shaders work with either textures or without textures.
-* Want to add normal mapping and parallax mapping
+* Add normal mapping and parallax mapping
+* Want to add VSM. Looked into it but need to understand it better.
 * Create a good looking scene!
 * (Not important yet) Build basic GUI functionality, probably [NanoVG](https://github.com/memononen/nanovg) but could try making my own basic buttons and sliders.
 * Basic forward rendering to begin with, can add deferred rendering functionality once I learn more about it.

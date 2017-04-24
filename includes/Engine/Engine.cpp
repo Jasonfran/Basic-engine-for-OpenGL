@@ -1,10 +1,11 @@
 
-#include "../includes/Engine.h"
-#include "../includes/BasicScene.h"
-#include "../includes/Input.h"
+#include "Engine.h"
+#include "../../scenes/BasicScene.h"
+#include "../Input/Input.h"
 #include <string>
 #include <iostream>
-#include "../includes/ResourceManager.h"
+#include "../ResourceManager/ResourceManager.h"
+#include "../Scene.h"
 Engine &Engine::instance()
 {
 	static Engine myInstance;
@@ -52,7 +53,7 @@ void Engine::update()
 {
 	if (currentScene == nullptr)
 	{
-		currentScene = new BasicScene();
+		currentScene = std::unique_ptr<BasicScene>(new BasicScene());
 	}
 	GLfloat delta = 0.0f;
 	GLfloat lastframetime = 0.0f;
@@ -83,9 +84,9 @@ void Engine::render()
 	glfwSwapBuffers( mainWindow );
 }
 
-void Engine::changeScene( Scene *nextScene )
+void Engine::changeScene( Scene* nextScene )
 {
-	currentScene = nextScene;
+	currentScene = std::unique_ptr<Scene>(nextScene);
 }
 
 void Engine::globalKeyInput()
@@ -98,13 +99,17 @@ void Engine::globalKeyInput()
 
 	if (Input::keyWasPressed(GLFW_KEY_R))
 	{
-		ResourceManager::reloadShaders();
+		for (auto &s : currentScene->shaders)
+		{
+			s.second->reload();
+		}
+		std::cout << "Shaders reloaded" << std::endl;
 	}
 
 	if (Input::keyWasPressed( GLFW_KEY_TAB ))
 	{
 		//currentScene->exit();
-		delete currentScene;
-		changeScene( new BasicScene() );
+		currentScene.reset();
+		changeScene(new BasicScene());
 	}
 }

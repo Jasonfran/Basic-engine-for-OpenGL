@@ -1,15 +1,24 @@
-#include "../includes/Model.h"
-#include "../includes/Texture2D.h"
-#include "../includes/stb_image.h"
+#include "Model.h"
+#include "../Texture2D/Texture2D.h"
+#include "../stb_image.h"
 
 #include <iostream>
 #include <memory>
 GLint textureFromFile( const char* path, std::string directory );
 
-void Model::draw(Shader shader)
+void Model::draw(Shader &shader)
 {
 	for (Mesh &m : meshes) {
+		m.getMaterial().setUniforms( shader );
 		m.draw(shader);
+	}
+}
+
+void Model::setMaterial( Material mat )
+{
+	for (Mesh &m : meshes)
+	{
+		m.setMaterial( mat );
 	}
 }
 
@@ -47,6 +56,7 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
 	std::vector<Texture> textures;
+	std::vector<glm::vec3> colours(4); //0 = ambient, 1 = diffuse, 2 = specular, first element of 3 = specular exponent
 
 	for (GLuint i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -76,14 +86,52 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 	if (mesh->mMaterialIndex >= 0)
 	{
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+		std::vector<Texture> ambientMaps = loadMaterialTextures( material, aiTextureType_AMBIENT, AMBIENT );
+		if (ambientMaps.size() == 0)
+		{
+			aiColor3D ambient;
+			if(material->Get( AI_MATKEY_COLOR_AMBIENT, ambient ) == aiReturn_SUCCESS)
+				colours[0] = glm::vec3( ambient.r, ambient.g, ambient.b );
+		}
+		else
+			textures.insert( textures.end(), ambientMaps.begin(), ambientMaps.end() );
+
 		std::vector<Texture> diffuseMaps = loadMaterialTextures( material, aiTextureType_DIFFUSE, DIFFUSE );
-		textures.insert( textures.end(), diffuseMaps.begin(), diffuseMaps.end() );
+		if (diffuseMaps.size() == 0)
+		{
+			aiColor3D diffuse;
+			if(material->Get( AI_MATKEY_COLOR_DIFFUSE, diffuse ) == aiReturn_SUCCESS)
+				colours[1] = glm::vec3( diffuse.r, diffuse.g, diffuse.b );
+		}else
+			textures.insert( textures.end(), diffuseMaps.begin(), diffuseMaps.end() );
+
 		std::vector<Texture> specularMaps = loadMaterialTextures( material, aiTextureType_SPECULAR, SPECULAR );
 		textures.insert( textures.end(), specularMaps.begin(), specularMaps.end() );
 		std::vector<Texture> normalMaps = loadMaterialTextures( material, aiTextureType_NORMALS, NORMAL );
 		textures.insert( textures.end(), normalMaps.begin(), normalMaps.end() );
+
+		// use G and B to indicate whether there is or isn't a specular colour and shininess value. bad models sometimes miss them
+		// This is lazy on my part and not clear without comments
+		aiColor3D specularColour;
+		if (material->Get( AI_MATKEY_COLOR_SPECULAR, specularColour ) == aiReturn_SUCCESS)
+		{
+			colours[2] = glm::vec3( specularColour.r, specularColour.g, specularColour.b );
+			colours[3].g = 1.0f;
+		}
+		else
+			colours[3].g = 0.0f;
+
+		float shininess;
+		if (material->Get( AI_MATKEY_SHININESS, shininess ) == aiReturn_SUCCESS)
+		{
+			colours[3] = glm::vec3( shininess, 0.0f, 0.0f );
+			colours[3].b = 1.0f;
+		}
+		else
+			colours[3].b = 0.0f;
 	}
-	return Mesh( vertices, indices, textures );
+	return Mesh( vertices, indices, textures, colours );
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type, MaterialType matType)

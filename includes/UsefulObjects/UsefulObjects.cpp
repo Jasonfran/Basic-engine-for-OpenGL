@@ -1,4 +1,4 @@
-#include "../includes/UsefulObjects.h"
+#include "UsefulObjects.h"
 
 GLfloat TexturedScreenQuad::vertices[] = {
 	-1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
@@ -8,6 +8,7 @@ GLfloat TexturedScreenQuad::vertices[] = {
 };
 GLuint TexturedScreenQuad::VAO;
 GLuint TexturedScreenQuad::VBO;
+GLint TexturedScreenQuad::numOfScreenQuads = 0;
 
 GLfloat Cube::vertices[] = {
 	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
@@ -54,6 +55,7 @@ GLfloat Cube::vertices[] = {
 };
 GLuint Cube::VAO;
 GLuint Cube::VBO;
+GLint Cube::numOfCubes = 0;
 
 GLfloat Plane::vertices[] = {
 	-10.0f,  0.0f, -10.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
@@ -65,3 +67,4 @@ GLfloat Plane::vertices[] = {
 };
 GLuint Plane::VAO;
 GLuint Plane::VBO;
+GLint Plane::numOfPlanes = 0;

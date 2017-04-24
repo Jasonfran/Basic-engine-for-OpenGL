@@ -10,8 +10,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
-#include "Input.h"
-#include "Engine.h"
+#include "Input/Input.h"
+//#include "Engine.h"
+
 // Default camera values
 const GLfloat YAW        = -90.0f;
 const GLfloat PITCH      =  0.0f;
@@ -99,7 +100,7 @@ public:
     }
 
 	GLboolean firstMouse = true;
-	GLfloat lastX = Engine::instance().SCREEN_WIDTH/2.0f, lastY = Engine::instance().SCREEN_HEIGHT/2.0f;
+	GLfloat lastX = 400.0f, lastY = 400.0f;
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(GLboolean constrainPitch = true)
     {
@@ -140,7 +141,7 @@ public:
 
 	void resetMouse()
 	{
-		lastX = Engine::instance().SCREEN_WIDTH / 2.0f, lastY = Engine::instance().SCREEN_HEIGHT / 2.0f;
+		lastX = 400.0f, lastY = 400.0f;
 		firstMouse = true;
 	}
 

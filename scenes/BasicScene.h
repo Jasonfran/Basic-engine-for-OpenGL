@@ -1,8 +1,8 @@
 #pragma once
-#include "Scene.h"
+#include "../includes/Scene.h"
 #include <GLFW/glfw3.h>
 #include <memory>
-#include "UsefulObjects.h"
+#include "../includes/UsefulObjects/UsefulObjects.h"
 
 class BasicScene : public Scene
 {

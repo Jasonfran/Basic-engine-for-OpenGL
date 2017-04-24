@@ -1,27 +1,40 @@
 #pragma once
 #include <iostream>
-#include "../includes/BasicScene.h"
-#include "../includes/Model.h"
-#include "../includes/Input.h"
+#include "../scenes/BasicScene.h"
+#include "../includes/Model/Model.h"
+#include "../includes/Input/Input.h"
 #include <glm/gtx/string_cast.hpp>
-#include "../includes/ResourceManager.h"
-#include "../includes/PointLight.h"
+#include "../includes/PointLight/PointLight.h"
+#include "../includes/FBO/FBO.h"
+#include "../includes/ResourceManager/ResourceManager.h"
+#include "../includes/Engine/Engine.h"
+
+#include <stdlib.h> 
+
 glm::mat4 prevProj;
 glm::mat4 prevView;
 GLboolean alternateView = false;
 GLboolean mouseLocked = true;
 GLuint alternateScreenTexture;
-GLint shadowWidth = 1024, shadowHeight = 1024;
+GLint shadowWidth = 2048, shadowHeight = 2048;
 
 BasicScene::BasicScene()
 {
-	ResourceManager::loadShader( "shaders/basic.vs", "shaders/basic.fs", NULL, "basic_shader" );
-	ResourceManager::loadShader( "shaders/postprocess/quad.vs", "shaders/postprocess/quad.fs", NULL, "post_process" );
-	ResourceManager::loadShader( "shaders/light.vs", "shaders/light.fs", NULL, "light_shader" );
-	ResourceManager::loadShader( "shaders/shadowdepth.vs", "shaders/shadowdepth.fs", NULL, "shadowdepth" );
-	ResourceManager::createFramebuffer( "post_process_screen", Engine::instance().SCREEN_WIDTH, Engine::instance().SCREEN_HEIGHT );
-	ResourceManager::addColourTextureToFramebuffer( "post_process_screen", "colour1", GL_RGB, GL_RGB, GL_UNSIGNED_BYTE );
-	ResourceManager::createFramebuffer( "light_shadow_buffer", shadowWidth, shadowHeight, true, true);
+	// Shaders
+	shaders["basic_shader"] = std::unique_ptr<Shader>(new Shader("shaders/basic.vs", "shaders/basic.fs", NULL));
+	shaders["post_process"] = std::unique_ptr<Shader>( new Shader( "shaders/postprocess/quad.vs", "shaders/postprocess/quad.fs", NULL));
+	shaders["light_shader"] = std::unique_ptr<Shader>( new Shader( "shaders/light.vs", "shaders/light.fs", NULL));
+	shaders["shadow_depth"] = std::unique_ptr<Shader>( new Shader( "shaders/shadowdepth.vs", "shaders/shadowdepth.fs", NULL));
+
+	// Framebuffers
+	framebuffers["post_process_screen"] = std::unique_ptr<FBO>( new FBO() );
+	framebuffers["post_process_screen"]->createColour("colour1", GL_TEXTURE_2D, 0, GL_RGB, Engine::instance().SCREEN_WIDTH, Engine::instance().SCREEN_HEIGHT,
+		0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
+	framebuffers["post_process_screen"]->createDepth( GL_TEXTURE_2D, 0, Engine::instance().SCREEN_WIDTH, Engine::instance().SCREEN_HEIGHT, GL_FLOAT );
+
+	//ResourceManager::createFramebuffer( "light_shadow_buffer", shadowWidth, shadowHeight, true, true);
+	framebuffers["light_shadow_buffer"] = std::unique_ptr<FBO>( new FBO() );
+	framebuffers["light_shadow_buffer"]->createDepth( GL_TEXTURE_2D, 0, shadowWidth, shadowHeight, GL_FLOAT);
 	glfwSetInputMode( Engine::instance().getCurrentWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED );
 	prevProj = glm::mat4();
 	prevView = glm::mat4();
@@ -39,12 +52,12 @@ BasicScene::BasicScene()
 	planeMaterial.specular = glm::vec3( 0.5f, 0.5f, 0.5f );
 	planeMaterial.shininess = 32.0f;
 
-	sceneObjects["teapot"] = new Model("assets/teapot/teapot.obj");
-	sceneObjects["teapot"]->setMaterial( teapotMaterial );
-	sceneObjects["plane"] = new Plane();
+	sceneObjects["teapot"] = std::unique_ptr<Model>(new Model("assets/teapot/teapot.obj"));
+	//sceneObjects["teapot"]->setMaterial( teapotMaterial );
+	sceneObjects["plane"] = std::unique_ptr<Plane>(new Plane());
 	sceneObjects["plane"]->setMaterial( planeMaterial );
 
-	sceneLights["light1"] = new PointLight( glm::vec3( 1.0f, 1.0f, 1.0f ), glm::vec3( 2.0f, 3.0f, 2.0f ), true);
+	pointLights["light1"] = std::unique_ptr<PointLight>(new PointLight( glm::vec3( 1.0f, 1.0f, 1.0f ), glm::vec3( 5.0f, 3.0f, 5.0f ), true));
 
 }
 
@@ -54,45 +67,47 @@ void BasicScene::update( GLfloat delta )
 
 	updateShaderUniforms( delta );
 
-	sceneObjects["teapot"]->setPos( glm::vec3( 0.0f, 0.0f, 0.0f ) );
-	//sceneObjects["teapot"]->setRot( 50.0f * glfwGetTime(), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-	sceneObjects["teapot"]->setScale( glm::vec3( 0.03f, 0.03f, 0.03f ));
-	sceneObjects["plane"]->setPos( glm::vec3( 0.0f, -2.0f, 0.0f ) );
-	sceneObjects["plane"]->setScale( glm::vec3( 50.0f, 50.0f, 50.0f ) );
-	sceneLights["light1"]->setPos( glm::vec3( 5.0f, 1.5 + 3.0f * sin(glfwGetTime()), 5.0f ));
+	sceneObjects["teapot"]->setPos(0.0f, 2.0f, 0.0f );
+	//sceneObjects["teapot"]->setRot( 50.0f * glfwGetTime(), 0.0f, 1.0f, 0.0f );
+	sceneObjects["teapot"]->setScale(0.05f, 0.05f, 0.05f);
+	sceneObjects["plane"]->setPos( 0.0f, 0.0f, 0.0f );
+	sceneObjects["plane"]->setScale( 50.0f, 50.0f, 50.0f);
+	pointLights["light1"]->setPos( 15.0f * sin(glfwGetTime()), 15.0f, 15.0f * cos(glfwGetTime()));
 }
 
 void BasicScene::updateShaderUniforms( GLfloat delta )
 {
 	// Basic shader
-	Shader shader = ResourceManager::getShader( "basic_shader" ).use();
+	Shader &basic_shader = shaders["basic_shader"]->use();
 	glm::mat4 view = camera.GetViewMatrix();
-	glm::mat4 projection = glm::perspective( glm::radians( camera.FOV ), (float)Engine::instance().SCREEN_WIDTH / (float)Engine::instance().SCREEN_HEIGHT, 0.1f, 100.0f );
-	shader.setVP( view, projection );
-	shader.setVector3f( "cameraPos", camera.Position );
-	sceneLights["light1"]->setUniforms( shader );
+	glm::mat4 projection = glm::perspective( glm::radians( camera.FOV ), (float)Engine::instance().SCREEN_WIDTH / (float)Engine::instance().SCREEN_HEIGHT, 0.1f, 10000.0f );
+	basic_shader.setVP( view, projection );
+	basic_shader.setVector3f( "cameraPos", camera.Position );
+	pointLights["light1"]->setUniforms( basic_shader );
+
 	
-	shader = ResourceManager::getShader( "post_process" ).use();
-	shader.setMatrix4( "inverseViewProjection", glm::inverse( projection * view ) );
-	shader.setMatrix4( "prevViewProjection", (prevProj * prevView) );
+	Shader &post_process_shader = shaders["post_process"]->use();
+	post_process_shader.setMatrix4( "inverseViewProjection", glm::inverse( projection * view ) );
+	post_process_shader.setMatrix4( "prevViewProjection", (prevProj * prevView) );
 	prevProj = projection;
 	prevView = view;
 
 
 	// Shadow shader
 	glm::mat4 lightProjection = glm::perspective( glm::radians( 40.0f ), 1.0f, 0.1f, 100.0f );
-	glm::mat4 lightView = glm::lookAt( sceneLights["light1"]->getPos(), glm::vec3( 0.0f, 2.0f, 0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+	glm::mat4 lightView = glm::lookAt( pointLights["light1"]->getPos(), glm::vec3( 0.0f, 2.0f, 0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-	shader = ResourceManager::getShader( "shadowdepth" ).use();
-	shader.setMatrix4( "lightSpaceMatrix", lightSpaceMatrix );
+	Shader &shadow_depth = shaders["shadow_depth"]->use();
+	shadow_depth.setMatrix4( "lightSpaceMatrix", lightSpaceMatrix );
 
-	shader = ResourceManager::getShader( "basic_shader" ).use();
-	shader.setMatrix4( "lightSpaceMatrix", lightSpaceMatrix );
+	// Use basic shader again so I can set the lightspacematrix
+	basic_shader.use();
+	basic_shader.setMatrix4( "lightSpaceMatrix", lightSpaceMatrix );
 
 	
 	// Lights
-	shader = ResourceManager::getShader( "light_shader" ).use();
-	shader.setVP( view, projection );
+	Shader &light_shader = shaders["light_shader"]->use();
+	light_shader.setVP( view, projection );
 
 
 	// Note to self: I used this to learn about how the coordinates are transformed since I was struggling to understand the important of the divide by W in the shader
@@ -125,59 +140,61 @@ void BasicScene::render()
 
 	// Render to depth map for shadows
 	glViewport( 0, 0, shadowWidth, shadowHeight );
-	ResourceManager::getFramebuffer( "light_shadow_buffer" ).bind();
+	framebuffers["light_shadow_buffer"]->bind();
+	glEnable( GL_CULL_FACE );
+	glCullFace( GL_BACK );
 	glClear( GL_DEPTH_BUFFER_BIT );
-	Shader shader = ResourceManager::getShader( "shadowdepth" ).use();
-	for (auto obj : sceneObjects)
+	Shader &shadow_depth = shaders["shadow_depth"]->use();
+	for (auto &obj : sceneObjects)
 	{
 		glm::mat4 model = obj.second->getModelMatrix();
-		shader.setMatrix4( "model", model );
-		//obj.second->getMaterial().setUniforms( shader );
-		obj.second->draw( shader );
+		shadow_depth.setMatrix4( "model", model );
+		//sobj.second->getMaterial().setUniforms( shader );
+		obj.second->draw( shadow_depth );
 	}
-
+	glDisable( GL_CULL_FACE );
 
 	// Normal rendering pass
 	glViewport( 0, 0, Engine::instance().SCREEN_WIDTH, Engine::instance().SCREEN_HEIGHT );
-	ResourceManager::getFramebuffer( "post_process_screen" ).bind();
+	framebuffers["post_process_screen"]->bind();
+	//ResourceManager::getFramebuffer( "post_process_screen" ).bind();
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glClearColor( 0.8f, 0.8f, 0.8f, 1.0f );
+	glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
 	//std::cout << "I'm rendering to a buffer!" << std::endl;
-	shader = ResourceManager::getShader( "basic_shader" ).use();
-	glActiveTexture( GL_TEXTURE4 );
-	glBindTexture( GL_TEXTURE_2D, ResourceManager::getFramebuffer( "light_shadow_buffer" ).depthTexture );
-	shader.setInteger( "depthMap", 4 );
-	for (auto obj : sceneObjects)
+	Shader &basic_shader = shaders["basic_shader"]->use();
+	glActiveTexture( GL_TEXTURE10 );
+	glBindTexture( GL_TEXTURE_2D, framebuffers["light_shadow_buffer"]->depthTexture );
+	basic_shader.setInteger( "depthMap", 10 );
+	for (auto &obj : sceneObjects)
 	{
 		glm::mat4 model = obj.second->updateModelMatrix();
-		shader.setMatrix4( "model", model );
-		obj.second->getMaterial().setUniforms(shader);
-		obj.second->draw( shader );
+		basic_shader.setMatrix4( "model", model );
+		obj.second->draw( basic_shader );
 	}
 
-	shader = ResourceManager::getShader( "light_shader" ).use();
-	for (auto obj : sceneLights)
+	Shader &light_shader = shaders["light_shader"]->use();
+	for (auto &obj : pointLights)
 	{	
-		if (obj.second->visible)
+		if (true)
 		{
 			glm::mat4 model = obj.second->updateModelMatrix();
-			shader.setMatrix4( "model", model );
-			obj.second->draw( shader );
+			light_shader.setMatrix4( "model", model );
+			obj.second->draw( light_shader );
 		}
 	}
 
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	glClear( GL_COLOR_BUFFER_BIT );
 	glDisable( GL_DEPTH_TEST );
-	shader = ResourceManager::getShader( "post_process" ).use();
-	Framebuffer framebuffer = ResourceManager::getFramebuffer( "post_process_screen" );
+	Shader &post_process = shaders["post_process"]->use();
+	FBO* framebuffer = framebuffers["post_process_screen"].get();
 	glActiveTexture( GL_TEXTURE0 );
-	shader.setInteger( "screenTexture", 0 );
-	glBindTexture( GL_TEXTURE_2D, framebuffer.getColourTexture("colour1") );
+	post_process.setInteger( "screenTexture", 0 );
+	glBindTexture( GL_TEXTURE_2D, framebuffer->colourTextures["colour1"] );
 	glActiveTexture( GL_TEXTURE1 );
-	shader.setInteger( "depthTexture", 1 );
-	glBindTexture( GL_TEXTURE_2D, framebuffer.depthTexture );
-	screenQuad.draw( shader );
+	post_process.setInteger( "depthTexture", 1 );
+	glBindTexture( GL_TEXTURE_2D, framebuffer->depthTexture );
+	screenQuad.draw( post_process );
 }
 // Updated each frame
 void BasicScene::keyInput(GLfloat delta)

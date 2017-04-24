@@ -1,9 +1,8 @@
 #pragma once
-#include "../includes/Mesh.h"
+#include "Mesh.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "SceneObject.h"
 
 class Model : public SceneObject
 {
@@ -12,7 +11,8 @@ public:
 	{
 		loadModel( path );
 	}
-	void draw( Shader shader );
+	void draw( Shader &shader );
+	void setMaterial( Material mat );
 	~Model();
 private:
 	std::vector<Mesh> meshes;

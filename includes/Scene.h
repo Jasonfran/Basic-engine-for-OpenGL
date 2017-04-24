@@ -8,15 +8,17 @@
 #include <map>
 #include <string>
 #include "Camera.h"
-#include "ResourceManager.h"
-#include "SceneObject.h"
-#include "PointLight.h"
+#include "PointLight/PointLight.h"
+#include <memory>
+#include "FBO/FBO.h"
 
 class Scene
 {
 public:
-	std::map <std::string, SceneObject*> sceneObjects;
-	std::map <std::string, PointLight*> sceneLights;
+	std::map <std::string, std::unique_ptr<SceneObject>> sceneObjects;
+	std::map <std::string, std::unique_ptr<PointLight>> pointLights;
+	std::map <std::string, std::unique_ptr<FBO>> framebuffers;
+	std::map <std::string, std::unique_ptr<Shader>> shaders;
 	Camera camera;
 	virtual void update(GLfloat delta) = 0;
 	virtual void updateShaderUniforms( GLfloat delta ) = 0;
@@ -25,18 +27,6 @@ public:
 	virtual void mouseButtonInput() = 0;
 	virtual void mouseInput() = 0;
 	virtual void scrollInput() = 0;
-	virtual ~Scene() {
-		for (std::map<std::string, SceneObject*>::iterator i = sceneObjects.begin(); i != sceneObjects.end(); i++)
-		{
-			delete i->second;
-		}
-		for (std::map<std::string, PointLight*>::iterator i = sceneLights.begin(); i != sceneLights.end(); i++)
-		{
-			delete i->second;
-		}
-		sceneObjects.clear();
-		sceneLights.clear();
-		ResourceManager::clear();
-	}
+	virtual ~Scene() { std::cout << "Exiting Scene" << std::endl; }
 };
 #endif // !SCENE_H

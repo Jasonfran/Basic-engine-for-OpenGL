@@ -121,34 +121,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Input.cpp" />
-    <ClCompile Include="src\Mesh.cpp" />
-    <ClCompile Include="src\Model.cpp" />
-    <ClCompile Include="src\BasicScene.cpp" />
-    <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="includes\FBO\FBO.cpp" />
+    <ClCompile Include="includes\SceneObject\SceneObject.cpp" />
+    <ClCompile Include="includes\Input\Input.cpp" />
+    <ClCompile Include="includes\Model\Mesh.cpp" />
+    <ClCompile Include="includes\Model\Model.cpp" />
+    <ClCompile Include="scenes\BasicScene.cpp" />
+    <ClCompile Include="includes\Engine\Engine.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\PointLight.cpp" />
-    <ClCompile Include="src\ResourceManager.cpp" />
-    <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\Texture2D.cpp" />
-    <ClCompile Include="src\UsefulObjects.cpp" />
+    <ClCompile Include="includes\PointLight\PointLight.cpp" />
+    <ClCompile Include="includes\ResourceManager\ResourceManager.cpp" />
+    <ClCompile Include="includes\Shader\Shader.cpp" />
+    <ClCompile Include="includes\Texture2D\Texture2D.cpp" />
+    <ClCompile Include="includes\UsefulObjects\UsefulObjects.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="includes\BasicScene.h" />
+    <ClInclude Include="scenes\BasicScene.h" />
     <ClInclude Include="includes\Camera.h" />
-    <ClInclude Include="includes\Engine.h" />
-    <ClInclude Include="includes\Framebuffer.h" />
-    <ClInclude Include="includes\Input.h" />
+    <ClInclude Include="includes\Engine\Engine.h" />
+    <ClInclude Include="includes\FBO\FBO.h" />
+    <ClInclude Include="includes\Input\Input.h" />
     <ClInclude Include="includes\Material.h" />
-    <ClInclude Include="includes\SceneObject.h" />
-    <ClInclude Include="includes\PointLight.h" />
-    <ClInclude Include="includes\Mesh.h" />
-    <ClInclude Include="includes\Model.h" />
+    <ClInclude Include="includes\SceneObject\SceneObject.h" />
+    <ClInclude Include="includes\PointLight\PointLight.h" />
+    <ClInclude Include="includes\Model\Mesh.h" />
+    <ClInclude Include="includes\Model\Model.h" />
     <ClInclude Include="includes\Scene.h" />
-    <ClInclude Include="includes\Shader.h" />
-    <ClInclude Include="includes\Texture2D.h" />
-    <ClInclude Include="includes\ResourceManager.h" />
-    <ClInclude Include="includes\UsefulObjects.h" />
+    <ClInclude Include="includes\Shader\Shader.h" />
+    <ClInclude Include="includes\Texture2D\Texture2D.h" />
+    <ClInclude Include="includes\ResourceManager\ResourceManager.h" />
+    <ClInclude Include="includes\UsefulObjects\UsefulObjects.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\basic.fs" />

@@ -1,6 +1,6 @@
-#include "..\includes\Input.h"
-#include "../includes/Engine.h"
-#include "../includes/Scene.h"
+#include "Input.h"
+#include "../Engine/Engine.h"
+#include "../Scene.h"
 #include <iostream>
 
 std::map<GLint, std::pair<GLboolean, GLboolean>> Input::keyStates;

@@ -16,8 +16,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <memory>
+#include "../Scene.h"
 
-class Scene;
 class Engine
 {
 public:
@@ -25,12 +26,12 @@ public:
 	void init( GLuint width, GLuint height, GLchar* title );
 	void update();
 	void render();
-	void changeScene(Scene *nextScene);
+	void changeScene(Scene* nextScene);
 	void globalKeyInput();
 	GLuint SCREEN_WIDTH;
 	GLuint SCREEN_HEIGHT;
 	GLFWwindow *getCurrentWindow() { return mainWindow; }
-	Scene *currentScene;
+	std::unique_ptr<Scene> currentScene;
 private:
 	GLFWwindow *mainWindow;
 	GLchar* WINDOW_TITLE;

@@ -1,11 +1,36 @@
-#include "../includes/Shader.h"
+#include "Shader.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+Shader::Shader( const GLchar *vertFile, const GLchar *fragFile, const GLchar *geomFile)
+{
+	this->loadFromFile( vertFile, fragFile, geomFile);
+}
+
+Shader::~Shader()
+{
+	//glUseProgram( 0 );
+	//glDeleteProgram( this->shaderID );
+	std::cout << "Shader deleted" << std::endl;
+}
 
 Shader &Shader::use()
 {
 	glUseProgram( this->shaderID );
 	return *this;
+}
+
+void Shader::reload()
+{
+	GLint currentShader;
+	glGetIntegerv( GL_CURRENT_PROGRAM, &currentShader );
+	if (currentShader == this->shaderID)
+		glUseProgram( 0 );
+	glDeleteProgram( this->shaderID );
+	this->loadFromFile(this->vertPath, this->fragPath, this->geomPath);
 }
 
 void Shader::compile( const GLchar *vertSource, const GLchar *fragSource, const GLchar *geomSource )
@@ -107,6 +132,50 @@ void Shader::setVP(glm::mat4 view, glm::mat4 projection, GLboolean useShader )
 		this->use();
 	setMatrix4( "view", view );
 	setMatrix4( "projection", projection );
+}
+
+void Shader::loadFromFile( const GLchar * vertFile, const GLchar * fragFile, const GLchar * geomFile)
+{
+	std::string vertCode;
+	std::string fragCode;
+	std::string geomCode;
+	std::ifstream vertexShaderFile;
+	std::ifstream fragmentShaderFile;
+	std::ifstream geomShaderFile;
+	vertexShaderFile.exceptions( std::ifstream::badbit );
+	fragmentShaderFile.exceptions( std::ifstream::badbit );
+	geomShaderFile.exceptions( std::ifstream::badbit );
+	try
+	{
+		vertexShaderFile.open( vertFile );
+		fragmentShaderFile.open( fragFile );
+		std::stringstream vShaderStream, fShaderStream;
+		vShaderStream << vertexShaderFile.rdbuf();
+		fShaderStream << fragmentShaderFile.rdbuf();
+		vertexShaderFile.close();
+		fragmentShaderFile.close();
+		vertCode = vShaderStream.str();
+		fragCode = fShaderStream.str();
+		if (geomFile != nullptr)
+		{
+			geomShaderFile.open( geomFile );
+			std::stringstream gShaderStream;
+			gShaderStream << geomShaderFile.rdbuf();
+			geomShaderFile.close();
+			geomCode = gShaderStream.str();
+		}
+	}
+	catch (std::exception e)
+	{
+		std::cout << "SHADER ERROR: FAILED TO READ SHADER FILE(S)" << std::endl;
+	}
+	const GLchar *vertShaderCode = vertCode.c_str();
+	const GLchar *fragShaderCode = fragCode.c_str();
+	const GLchar *geomShaderCode = geomCode.c_str();
+	this->vertPath = vertFile;
+	this->fragPath = fragFile;
+	this->geomPath = geomFile;
+	this->compile( vertShaderCode, fragShaderCode, geomFile != nullptr ? fragShaderCode : nullptr );
 }
 
 void Shader::checkCompileErrors( GLuint object, std::string type )

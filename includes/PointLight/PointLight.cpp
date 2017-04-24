@@ -1,4 +1,4 @@
-#include "../includes/PointLight.h"
+#include "PointLight.h"
 
 GLfloat PointLight::vertices[] = {
 	-0.5f, -0.5f, -0.5f,

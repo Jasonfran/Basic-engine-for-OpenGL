@@ -1,23 +1,64 @@
 #pragma once
 #include <GL/glew.h>
 #include <glm/common.hpp>
-#include "Shader.h"
+#include "Shader/Shader.h"
 
 struct Material
 {
 public:
 	glm::vec3 ambient;
+	GLuint ambientTexture;
+	GLint usesAmbientTexture = 0;
 	glm::vec3 diffuse;
-	glm::vec3 specular;
-	GLfloat shininess;
+	GLuint diffuseTexture;
+	GLint usesDiffuseTexture = 0;
+	glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	GLuint specularTexture;
+	GLint usesSpecularTexture = 0;
+	GLuint normalTexture;
+	GLint usesNormalTexture = 0;
+	GLuint shininess = 16.0f;
 	
-	void setUniforms( Shader shader, GLboolean useShader = false )
+	void setUniforms( Shader &shader, GLboolean useShader = false )
 	{
 		if (useShader)
 			shader.use();
-		shader.setVector3f( "material.ambient", ambient, false );
-		shader.setVector3f( "material.diffuse", diffuse, false );
-		shader.setVector3f( "material.specular", specular, false );
+		if (usesAmbientTexture)
+		{
+			glActiveTexture( GL_TEXTURE0 );
+			glBindTexture( GL_TEXTURE_2D, ambientTexture );
+			shader.setInteger( "material.ambientTexture", 0 );
+		} else
+			shader.setVector3f( "material.ambient", ambient, false );
+
+		if (usesDiffuseTexture)
+		{
+			glActiveTexture( GL_TEXTURE1 );
+			glBindTexture( GL_TEXTURE_2D, diffuseTexture );
+			shader.setInteger( "material.diffuseTexture", 1 );
+		}
+		else
+			shader.setVector3f( "material.diffuse", diffuse, false );
+		if (usesSpecularTexture)
+		{
+			glActiveTexture( GL_TEXTURE2 );
+			glBindTexture( GL_TEXTURE_2D, specularTexture );
+			shader.setInteger( "material.specularTexture", 2 );
+		}
+		else
+			shader.setVector3f( "material.specular", specular, false );
+
+		if (usesNormalTexture)
+		{
+			glActiveTexture( GL_TEXTURE3 );
+			glBindTexture( GL_TEXTURE_2D, normalTexture );
+			shader.setInteger( "material.normalTexture", 3 );
+		}
+		shader.setInteger( "material.usesAmbientTexture", usesAmbientTexture );
+		shader.setInteger( "material.usesDiffuseTexture", usesDiffuseTexture );
+		shader.setInteger( "material.usesSpecularTexture", usesSpecularTexture );
+		shader.setInteger( "material.usesNormalTexture", usesNormalTexture );
 		shader.setFloat( "material.shininess", shininess, false );
+		glActiveTexture( GL_TEXTURE0 );
 	}
 };

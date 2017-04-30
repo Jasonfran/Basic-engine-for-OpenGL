@@ -16,7 +16,6 @@ Has easy scene creation, model loading, input, buffer creation. This scene blinn
 
 ## Things to do
 * Need to add multiple lights
-* Need to add common a common material system so the shaders work with either textures or without textures.
 * Add normal mapping and parallax mapping
 * Want to add VSM. Looked into it but need to understand it better.
 * Create a good looking scene!

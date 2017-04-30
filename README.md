@@ -6,7 +6,7 @@ I used http://learnopengl.com/ to learn OpenGL and to help myself implement the 
 ## Result so far
 ![image](http://i.imgur.com/sp4V4fZ.png)
 
-This scene uses a free model from CGTrader but in obj format and does not load textures. Has point light with shadows.
+This scene uses a free model from CGTrader but in obj format and does not have a correct MTL file for textures. Has point light with shadows.
 
 ## External libraries
 * GLFW

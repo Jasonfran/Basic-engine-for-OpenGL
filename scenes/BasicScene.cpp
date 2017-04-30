@@ -24,7 +24,7 @@ BasicScene::BasicScene()
 	shaders["basic_shader"] = std::unique_ptr<Shader>(new Shader("shaders/basic.vs", "shaders/basic.fs", NULL));
 	shaders["post_process"] = std::unique_ptr<Shader>( new Shader( "shaders/postprocess/quad.vs", "shaders/postprocess/quad.fs", NULL));
 	shaders["light_shader"] = std::unique_ptr<Shader>( new Shader( "shaders/light.vs", "shaders/light.fs", NULL));
-	shaders["shadow_depth"] = std::unique_ptr<Shader>( new Shader( "shaders/shadowdepth.vs", "shaders/shadowdepth.fs", NULL));
+	shaders["shadow_depth"] = std::unique_ptr<Shader>( new Shader( "shaders/shadowdepth.vs", "shaders/shadowdepth.fs", "shaders/shadowdepth.gs"));
 
 	// Framebuffers
 	framebuffers["post_process_screen"] = std::unique_ptr<FBO>( new FBO() );
@@ -32,9 +32,9 @@ BasicScene::BasicScene()
 		0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
 	framebuffers["post_process_screen"]->createDepth( GL_TEXTURE_2D, 0, Engine::instance().SCREEN_WIDTH, Engine::instance().SCREEN_HEIGHT, GL_FLOAT );
 
-	//ResourceManager::createFramebuffer( "light_shadow_buffer", shadowWidth, shadowHeight, true, true);
 	framebuffers["light_shadow_buffer"] = std::unique_ptr<FBO>( new FBO() );
-	framebuffers["light_shadow_buffer"]->createDepth( GL_TEXTURE_2D, 0, shadowWidth, shadowHeight, GL_FLOAT);
+	framebuffers["light_shadow_buffer"]->createDepthCubemap( 0, shadowWidth, shadowHeight, GL_FLOAT );
+
 	glfwSetInputMode( Engine::instance().getCurrentWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED );
 	prevProj = glm::mat4();
 	prevView = glm::mat4();
@@ -58,6 +58,7 @@ BasicScene::BasicScene()
 	sceneObjects["plane"]->setMaterial( planeMaterial );
 
 	pointLights["light1"] = std::unique_ptr<PointLight>(new PointLight( glm::vec3( 1.0f, 1.0f, 1.0f ), glm::vec3( 5.0f, 3.0f, 5.0f ), true));
+	
 
 }
 
@@ -94,17 +95,30 @@ void BasicScene::updateShaderUniforms( GLfloat delta )
 
 
 	// Shadow shader
-	glm::mat4 lightProjection = glm::perspective( glm::radians( 40.0f ), 1.0f, 0.1f, 100.0f );
-	glm::mat4 lightView = glm::lookAt( pointLights["light1"]->getPos(), glm::vec3( 0.0f, 2.0f, 0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+	GLfloat near_plane = 0.1f;
+	GLfloat far_plane = 100.0f;
+	glm::mat4 lightProj = glm::perspective( glm::radians( 90.0f ), (float)shadowWidth / (float)shadowHeight, near_plane, far_plane );
+	glm::vec3 lightPos = pointLights["light1"]->getPos();
+	glm::mat4 lightShadowTransforms[6] = {
+		lightProj * glm::lookAt( lightPos, lightPos + glm::vec3( 1.0f, 0.0f, 0.0f ), glm::vec3( 0.0f, -1.0f, 0.0f ) ),
+		lightProj * glm::lookAt( lightPos, lightPos + glm::vec3( -1.0f, 0.0f, 0.0f ), glm::vec3( 0.0f, -1.0f, 0.0f ) ),
+		lightProj * glm::lookAt( lightPos, lightPos + glm::vec3( 0.0f, 1.0f, 0.0f ), glm::vec3( 0.0f, 0.0f, 1.0f ) ),
+		lightProj * glm::lookAt( lightPos, lightPos + glm::vec3( 0.0f, -1.0f, 0.0f ), glm::vec3( 0.0f, 1.0f, -1.0f ) ),
+		lightProj * glm::lookAt( lightPos, lightPos + glm::vec3( 0.0f, 0.0f, 1.0f ), glm::vec3( 0.0f, -1.0f, 0.0f ) ),
+		lightProj * glm::lookAt( lightPos, lightPos + glm::vec3( 0.0f, 0.0f, -1.0f ), glm::vec3( 0.0f, -1.0f, 0.0f ) ),
+	};
 	Shader &shadow_depth = shaders["shadow_depth"]->use();
-	shadow_depth.setMatrix4( "lightSpaceMatrix", lightSpaceMatrix );
+	// Send each transform to the array in the shader
+	for (GLuint i = 0; i < 6; i++)
+	{
+		shadow_depth.setMatrix4( ("shadowTransforms[" + std::to_string(i) + "]").c_str(), lightShadowTransforms[i] );
+	}
+	shadow_depth.setVector3f( "lightPos", lightPos );
+	shadow_depth.setFloat( "far_plane", far_plane );
 
-	// Use basic shader again so I can set the lightspacematrix
 	basic_shader.use();
-	basic_shader.setMatrix4( "lightSpaceMatrix", lightSpaceMatrix );
+	basic_shader.setFloat( "far_plane", far_plane );
 
-	
 	// Lights
 	Shader &light_shader = shaders["light_shader"]->use();
 	light_shader.setVP( view, projection );
@@ -149,7 +163,6 @@ void BasicScene::render()
 	{
 		glm::mat4 model = obj.second->getModelMatrix();
 		shadow_depth.setMatrix4( "model", model );
-		//sobj.second->getMaterial().setUniforms( shader );
 		obj.second->draw( shadow_depth );
 	}
 	glDisable( GL_CULL_FACE );
@@ -163,7 +176,7 @@ void BasicScene::render()
 	//std::cout << "I'm rendering to a buffer!" << std::endl;
 	Shader &basic_shader = shaders["basic_shader"]->use();
 	glActiveTexture( GL_TEXTURE10 );
-	glBindTexture( GL_TEXTURE_2D, framebuffers["light_shadow_buffer"]->depthTexture );
+	glBindTexture( GL_TEXTURE_CUBE_MAP, framebuffers["light_shadow_buffer"]->depthTexture );
 	basic_shader.setInteger( "depthMap", 10 );
 	for (auto &obj : sceneObjects)
 	{

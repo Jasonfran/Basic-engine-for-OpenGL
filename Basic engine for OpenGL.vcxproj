@@ -154,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\basic.fs" />
+    <None Include="shaders\shadowdepth.gs" />
     <None Include="shaders\basic.vs" />
     <None Include="shaders\light.fs" />
     <None Include="shaders\light.vs" />

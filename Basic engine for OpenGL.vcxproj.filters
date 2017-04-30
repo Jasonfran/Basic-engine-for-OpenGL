@@ -111,6 +111,7 @@
     <None Include="shaders\postprocess\quad.vs" />
     <None Include="shaders\shadowdepth.vs" />
     <None Include="shaders\shadowdepth.fs" />
+    <None Include="shaders\shadowdepth.gs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\assimp.lib" />

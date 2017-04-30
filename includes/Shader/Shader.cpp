@@ -175,7 +175,7 @@ void Shader::loadFromFile( const GLchar * vertFile, const GLchar * fragFile, con
 	this->vertPath = vertFile;
 	this->fragPath = fragFile;
 	this->geomPath = geomFile;
-	this->compile( vertShaderCode, fragShaderCode, geomFile != nullptr ? fragShaderCode : nullptr );
+	this->compile( vertShaderCode, fragShaderCode, geomFile != nullptr ? geomShaderCode : nullptr );
 }
 
 void Shader::checkCompileErrors( GLuint object, std::string type )

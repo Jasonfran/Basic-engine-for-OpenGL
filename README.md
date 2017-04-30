@@ -4,9 +4,9 @@ Basic engine to help me learn OpenGL. No pro but learning as I go. Will hopefull
 I used http://learnopengl.com/ to learn OpenGL and to help myself implement the basics of the engine such as shader loading, texture loading and model loading.
 
 ## Result so far
-![image](http://i.imgur.com/DQsmYAs.png)
+![image](http://i.imgur.com/sp4V4fZ.png)
 
-Has easy scene creation, model loading, input, buffer creation. This scene blinn-phong lighting has shadows with a good bias.
+This scene uses a free model from CGTrader but in obj format and does not load textures. Has point light with shadows.
 
 ## External libraries
 * GLFW

@@ -4,9 +4,9 @@ Basic engine to help me learn OpenGL. No pro but learning as I go. Will hopefull
 I used http://learnopengl.com/ to learn OpenGL and to help myself implement the basics of the engine such as shader loading, texture loading and model loading.
 
 ## Result so far
-![image](http://i.imgur.com/sp4V4fZ.png)
+![image](http://i.imgur.com/pmFfnM3.png)
 
-This scene uses a free model from CGTrader but in obj format and does not have a correct MTL file for textures. Has point light with shadows.
+This scene uses a free model from http://graphics.cs.williams.edu/data/meshes.xml but in obj format and does not textures. Has point light with shadows.
 
 ## External libraries
 * GLFW

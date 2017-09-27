@@ -16,7 +16,7 @@ glm::mat4 prevView;
 GLboolean alternateView = false;
 GLboolean mouseLocked = true;
 GLuint alternateScreenTexture;
-GLint shadowWidth = 2048, shadowHeight = 2048;
+GLint shadowWidth = 512, shadowHeight = 512;
 
 BasicScene::BasicScene()
 {
@@ -46,20 +46,33 @@ BasicScene::BasicScene()
 	teapotMaterial.diffuse = glm::vec3( 0.8f, 0.0f, 0.0f );
 	teapotMaterial.specular = glm::vec3( 1.0f, 1.0f, 1.0f );
 	teapotMaterial.shininess = 10.0f;
+	
 	Material planeMaterial;
-	planeMaterial.ambient = glm::vec3( 0.0f, 0.5f, 0.5f );
-	planeMaterial.diffuse = glm::vec3( 0.0f, 0.5f, 0.5f );
+	Texture2D brick;
+	brick.genFromFile( "assets/brick.JPG" );
+	Texture2D brickBump;
+	brickBump.genFromFile( "assets/brick-norm.JPG" );
+	planeMaterial.ambientTexture = brick.textureID;
+	planeMaterial.usesAmbientTexture = 1;
+	planeMaterial.diffuseTexture = brick.textureID;
+	planeMaterial.usesDiffuseTexture = 1;
 	planeMaterial.specular = glm::vec3( 0.5f, 0.5f, 0.5f );
 	planeMaterial.shininess = 32.0f;
+	planeMaterial.normalTexture = brickBump.textureID;
+	planeMaterial.usesNormalTexture = 1;
 
-	sceneObjects["teapot"] = std::unique_ptr<Model>(new Model("assets/teapot/teapot.obj"));
+	sceneObjects["teapot"] = std::unique_ptr<Model>(new Model("assets/tree.obj"));
 	//sceneObjects["teapot"]->setMaterial( teapotMaterial );
-	sceneObjects["plane"] = std::unique_ptr<Plane>(new Plane());
-	sceneObjects["plane"]->setMaterial( planeMaterial );
 
-	pointLights["light1"] = std::unique_ptr<PointLight>(new PointLight( glm::vec3( 1.0f, 1.0f, 1.0f ), glm::vec3( 5.0f, 3.0f, 5.0f ), true));
-	
+	for (int i = 0; i < 3; ++i)
+	{
+		std::string name = "plane" + std::to_string( i );
+		std::cout << name << std::endl;
+		sceneObjects[name] = std::unique_ptr<Plane>( new Plane() );
+		sceneObjects[name]->setMaterial( planeMaterial );
+	}
 
+	pointLights["light1"] = std::unique_ptr<PointLight>(new PointLight( glm::vec3( 1.0f, 1.0f, 1.0f ), glm::vec3( 5.0f, 5.0f, 5.0f ), true));
 }
 
 
@@ -70,10 +83,19 @@ void BasicScene::update( GLfloat delta )
 
 	sceneObjects["teapot"]->setPos(0.0f, 2.0f, 0.0f );
 	//sceneObjects["teapot"]->setRot( 50.0f * glfwGetTime(), 0.0f, 1.0f, 0.0f );
-	sceneObjects["teapot"]->setScale(0.05f, 0.05f, 0.05f);
-	sceneObjects["plane"]->setPos( 0.0f, 0.0f, 0.0f );
-	sceneObjects["plane"]->setScale( 50.0f, 50.0f, 50.0f);
-	pointLights["light1"]->setPos( 15.0f * sin(glfwGetTime()), 15.0f, 15.0f * cos(glfwGetTime()));
+	sceneObjects["teapot"]->setScale(0.5f, 0.5f, 0.5f);
+
+	for (int i = 0; i < 3; ++i)
+	{
+		std::string name = "plane" + std::to_string( i );
+		sceneObjects[name]->setPos( 10.0f * i, 0.0f, 0.0f );
+	}
+
+	sceneObjects["plane1"]->setPos( 0.0f, 0.0f, 0.0f );
+	sceneObjects["plane1"]->setScale( 1.0f, 1.0f, 1.0f);
+	//sceneObjects["plane"]->setRot( 90.0f, 1.0f, 0.0f, 0.0f );
+	//pointLights["light1"]->setPos( 15.0f * sin(glfwGetTime()), 15.0f, 15.0f * cos(glfwGetTime()));
+
 }
 
 void BasicScene::updateShaderUniforms( GLfloat delta )
@@ -130,7 +152,7 @@ void BasicScene::updateShaderUniforms( GLfloat delta )
 	// and wanted to properly construct the world position then I need to divide by W to correct the perspective divide.
 	// My assumption is that since the projection is being inversed then you can reverse the divide by dividing by the inverse. That's just maths.
 	// This seems to agree with my assumption! http://www.iquilezles.org/blog/?p=1911
-	/*glBindFramebuffer( GL_FRAMEBUFFER, ResourceManager::getFramebuffer( "post_process_screen" ).fbo );
+	/*glBindFramebuffer( GL_FRAMEBUFFER, framebuffers["post_process_screen"]->id );
 	glm::vec2 texCoords = glm::vec2( 0.5f, 0.5f );
 	GLfloat depth;
 	glReadPixels( 400, 300, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth );
@@ -151,7 +173,7 @@ void BasicScene::updateShaderUniforms( GLfloat delta )
 void BasicScene::render()
 {
 	glEnable( GL_DEPTH_TEST );
-
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	// Render to depth map for shadows
 	glViewport( 0, 0, shadowWidth, shadowHeight );
 	framebuffers["light_shadow_buffer"]->bind();
@@ -172,7 +194,7 @@ void BasicScene::render()
 	framebuffers["post_process_screen"]->bind();
 	//ResourceManager::getFramebuffer( "post_process_screen" ).bind();
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
+	glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
 	//std::cout << "I'm rendering to a buffer!" << std::endl;
 	Shader &basic_shader = shaders["basic_shader"]->use();
 	glActiveTexture( GL_TEXTURE10 );
@@ -195,7 +217,7 @@ void BasicScene::render()
 			obj.second->draw( light_shader );
 		}
 	}
-
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	glClear( GL_COLOR_BUFFER_BIT );
 	glDisable( GL_DEPTH_TEST );
@@ -233,8 +255,7 @@ void BasicScene::mouseButtonInput()
 {
 	if (Input::mouseButtonWasPressed( GLFW_MOUSE_BUTTON_1 ))
 	{
-		//std::pair<GLfloat, GLfloat> mousePos = Input::getMousePos();
-		//std::cout << "Mouse button 1 pressed at: " << mousePos.first << ", " << mousePos.second << std::endl;
+		
 	}
 }
 // Updated only when mouse is moved

@@ -7,7 +7,7 @@ Mesh::Mesh( std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vect
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = textures;
-	this->colours = colours; //0 = ambient, 1 = diffuse, 2 = specular, first element of 3 = specular exponent
+	this->colours = colours; //0 = ambient, 1 = diffuse, 2 = specular, first element of 3 = specular exponent, 4 = opacity;
 
 	this->setupMesh();
 }
@@ -101,6 +101,8 @@ void Mesh::setupMesh()
 
 	if (colours[3].g == 1.0f)
 		material.shininess = colours[3].r;
+
+	material.opacity = colours[4].r;
 
 	this->setMaterial(material);
 }

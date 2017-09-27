@@ -4,7 +4,7 @@
 int main()
 {
 	Engine &engine = Engine::instance();
-	engine.init( 800, 800, "My engine" );
+	engine.init( 1920, 1080, "My engine" );
 	//char cc;
 	//std::cin >> cc;
 	return 0;

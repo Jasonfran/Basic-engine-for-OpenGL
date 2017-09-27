@@ -17,7 +17,8 @@ public:
 	GLint usesSpecularTexture = 0;
 	GLuint normalTexture;
 	GLint usesNormalTexture = 0;
-	GLuint shininess = 16.0f;
+	GLfloat shininess = 16.0f;
+	GLfloat opacity = 1.0f;
 	
 	void setUniforms( Shader &shader, GLboolean useShader = false )
 	{
@@ -59,6 +60,7 @@ public:
 		shader.setInteger( "material.usesSpecularTexture", usesSpecularTexture );
 		shader.setInteger( "material.usesNormalTexture", usesNormalTexture );
 		shader.setFloat( "material.shininess", shininess, false );
+		shader.setFloat("material.opacity", opacity, false);
 		glActiveTexture( GL_TEXTURE0 );
 	}
 };

@@ -56,7 +56,7 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
 	std::vector<Texture> textures;
-	std::vector<glm::vec3> colours(4); //0 = ambient, 1 = diffuse, 2 = specular, first element of 3 = specular exponent
+	std::vector<glm::vec3> colours(5); //0 = ambient, 1 = diffuse, 2 = specular, first element of 3 = specular exponent
 
 	for (GLuint i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -130,6 +130,14 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 		}
 		else
 			colours[3].b = 0.0f;
+
+		float opacity;
+		if (material->Get(AI_MATKEY_OPACITY, opacity) == aiReturn_SUCCESS) {
+			colours[4].r = opacity;
+		}
+		else {
+			colours[4].r = 1.0f;
+		}
 	}
 	return Mesh( vertices, indices, textures, colours );
 }

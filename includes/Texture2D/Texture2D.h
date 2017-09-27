@@ -1,5 +1,6 @@
 #pragma once
 #include <GL/glew.h>
+#include <string>
 
 class Texture2D
 {
@@ -16,5 +17,6 @@ public:
 	Texture2D();
 	void generate( GLuint width, GLuint height, unsigned char * data, GLuint internalFormat = GL_RGB, GLuint format = GL_RGB, GLuint dataType = GL_UNSIGNED_BYTE,
 				   GLuint wrapS = GL_REPEAT, GLuint wrapT = GL_REPEAT, GLuint filterMin = GL_LINEAR, GLuint filterMax = GL_LINEAR );
+	void genFromFile( char* path );
 	void bind() const;
 };
